@@ -1,0 +1,38 @@
+/*fuentes*/
+@font-face{
+    font-family: "pirate";
+    src: url("media/fonts/VengeanceAtSea.otf");
+}
+
+/*html*/
+body{
+    background-color: #fbe4bd;
+}
+
+header{
+    /*orden*/
+    display: flex;
+    justify-content: space-around;
+    margin: 4vh 10vw;
+    /*texto*/
+    font-family: "pirate";
+    font-size: 5em;
+    color: #5d768b;
+}
+
+main{
+    display: flex;
+    justify-content: space-between;
+}
+
+table{
+    justify-content: center;
+}
+
+td{
+    border: 1px solid black;
+    width: 1.75vw;
+    height: 3.5vh;
+}
+
+
