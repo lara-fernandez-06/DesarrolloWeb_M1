@@ -1,39 +1,39 @@
-const defaultDim=18;
+const defaultDimX=14;
+const defaultDimY=18;
 const defaultTreasure=40;
 
 
 //dimension por defecto es 18x18
-function generateMap(dimension=defaultDim, treasures=defaultTreasure){
+function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, treasures=defaultTreasure){
     
     //control de errores: no puede haber mas tesoros que el cuadrado de la dim (los tesoros seran un 25% del tablero)
-    if(treasures>=dimension*dimension) treasures = Math.floor(0.25*dimension*dimension);
+    if(treasures>=dimensionX*dimensionY) treasures = Math.floor(0.25*dimensionX*dimensionY);
 
     //inicializamos matriz
-    const infoMatrix = createMatrix(dimension);
+    const infoMatrix = createMatrix(dimensionX, dimensionY);
 
     //primero rellenamos la matriz que guarda la información (donde están los tesoros (-1) y los números)
-    generateTreasures(infoMatrix, dimension, treasures);
+    generateTreasures(infoMatrix, treasures);
 
     //ponemos los numeros segun el numero de tesoros que tengan alrededor
-    generateMapNumbers(infoMatrix, dimension);
+    generateMapNumbers(infoMatrix);
 
     printMatrix(infoMatrix);
 
 }
 
-function createMatrix(dimension=defaultDim){
+function createMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
 
     let gridString="";
 
-    let infoMatrix = Array(dimension);
-    for(let i=0; i<dimension; i++){
+    let infoMatrix = Array(dimensionX);
+    for(let i=0; i<dimensionX; i++){
 
-        infoMatrix[i] = Array(dimension).fill(0);
+        infoMatrix[i] = Array(dimensionY).fill(0);
         gridString+="<tr>";
 
-        for(let j=0; j<dimension; j++){
-            let pos = i*dimension + j;
-            //dar un umero a cada celda?
+        for(let j=0; j<dimensionY; j++){
+            //dar un umero a cada celda? parametros en la funcion
             gridString+="<td onclick='manageLeftClick()'></td>";
         }
 
@@ -46,10 +46,10 @@ function createMatrix(dimension=defaultDim){
     
 }
 
-function generateTreasures(infoMatrix = createMatrix(defaultDim), dimension=defaultDim, treasures=defaultTreasure){
+function generateTreasures(infoMatrix = createMatrix(defaultDimX, defaultDimY), treasures=defaultTreasure){
     
     let cont=0;
-    let max=dimension*dimension; //para evitar hacer esta operacion todo el rato
+    let max=infoMatrix.length*infoMatrix[0].length; //para evitar hacer esta operacion todo el rato
     //hasta que todas los tesoros hayan sido colocadas
 
     while(cont<treasures){
@@ -57,8 +57,8 @@ function generateTreasures(infoMatrix = createMatrix(defaultDim), dimension=defa
         let pos=Math.floor(Math.random()*max); //numero de la casilla de la mina
         
         //posicion en la matriz
-        let i = Math.floor(pos/dimension);
-        let j = pos - i * dimension;
+        let i = Math.floor(pos/infoMatrix[0].length);
+        let j = pos - i * infoMatrix[0].length;
 
         if(infoMatrix[i][j] !== -1){
             infoMatrix[i][j] = -1;
@@ -68,7 +68,7 @@ function generateTreasures(infoMatrix = createMatrix(defaultDim), dimension=defa
     
 }
 
-function generateMapNumbers(infoMatrix = createMatrix(defaultDim), dimension=defaultDim){
+function generateMapNumbers(infoMatrix = createMatrix(defaultDim)){
 
     // [] [] [] [] []
     // [] [x] [] [9] []
@@ -90,7 +90,7 @@ function generateMapNumbers(infoMatrix = createMatrix(defaultDim), dimension=def
                     let nuevaJ = j+rodeoY[k];
 
                     //miramos que lo que estamos comprobanod esta dentro del tablero
-                    if(nuevaI>=0 && nuevaJ >=0 && nuevaI<dimension && nuevaJ<dimension){
+                    if(nuevaI>=0 && nuevaJ >=0 && nuevaI<infoMatrix.length && nuevaJ<infoMatrix[0].length){
                         //si hay tesoro, aumenta el contador
                         if(infoMatrix[nuevaI][nuevaJ]===-1)cont++;
                     }
