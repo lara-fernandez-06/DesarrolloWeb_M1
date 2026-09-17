@@ -7,6 +7,8 @@
 /*html*/
 body{
     background-color: #fbe4bd;
+    height: 100%;
+    overflow: hidden;
 }
 
 header{

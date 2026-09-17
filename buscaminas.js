@@ -1,4 +1,3 @@
-var infoMatrix = [];
 const defaultDim=18;
 const defaultTreasure=40;
 
@@ -10,13 +9,13 @@ function generateMap(dimension=defaultDim, treasures=defaultTreasure){
     if(treasures>=dimension*dimension) treasures = Math.floor(0.25*dimension*dimension);
 
     //inicializamos matriz
-    createMatrix(dimension);
+    const infoMatrix = createMatrix(dimension);
 
     //primero rellenamos la matriz que guarda la información (donde están los tesoros (-1) y los números)
-    generateTreasures(dimension, treasures);
+    generateTreasures(infoMatrix, dimension, treasures);
 
     //ponemos los numeros segun el numero de tesoros que tengan alrededor
-    generateMapNumbers(dimension);
+    generateMapNumbers(infoMatrix, dimension);
 
     printMatrix(infoMatrix);
 
@@ -26,7 +25,7 @@ function createMatrix(dimension=defaultDim){
 
     let gridString="";
 
-    infoMatrix = Array(dimension);
+    let infoMatrix = Array(dimension);
     for(let i=0; i<dimension; i++){
 
         infoMatrix[i] = Array(dimension).fill(0);
@@ -42,10 +41,12 @@ function createMatrix(dimension=defaultDim){
     }
 
     document.getElementById('board').innerHTML = gridString;
+
+    return infoMatrix;
     
 }
 
-function generateTreasures(dimension=defaultDim, treasures=defaultTreasure){
+function generateTreasures(infoMatrix = createMatrix(defaultDim), dimension=defaultDim, treasures=defaultTreasure){
     
     let cont=0;
     let max=dimension*dimension; //para evitar hacer esta operacion todo el rato
@@ -59,7 +60,7 @@ function generateTreasures(dimension=defaultDim, treasures=defaultTreasure){
         let i = Math.floor(pos/dimension);
         let j = pos - i * dimension;
 
-        if(infoMatrix[i][j] != -1){
+        if(infoMatrix[i][j] !== -1){
             infoMatrix[i][j] = -1;
             cont++;
         }
@@ -67,7 +68,7 @@ function generateTreasures(dimension=defaultDim, treasures=defaultTreasure){
     
 }
 
-function generateMapNumbers(dimension=defaultDim){
+function generateMapNumbers(infoMatrix = createMatrix(defaultDim), dimension=defaultDim){
 
     // [] [] [] [] []
     // [] [x] [] [9] []
@@ -81,7 +82,7 @@ function generateMapNumbers(dimension=defaultDim){
         for(let j = 0; j<infoMatrix[i].length; j++){
 
             //si ya es un tesoro, no hace falta hacer nada
-            if(infoMatrix[i][j]!=-1){
+            if(infoMatrix[i][j]!==-1){
                 
                 let cont = 0;
                 for(let k=0; k<8; k++){
@@ -91,7 +92,7 @@ function generateMapNumbers(dimension=defaultDim){
                     //miramos que lo que estamos comprobanod esta dentro del tablero
                     if(nuevaI>=0 && nuevaJ >=0 && nuevaI<dimension && nuevaJ<dimension){
                         //si hay tesoro, aumenta el contador
-                        if(infoMatrix[nuevaI][nuevaJ]==-1)cont++;
+                        if(infoMatrix[nuevaI][nuevaJ]===-1)cont++;
                     }
 
                 }
