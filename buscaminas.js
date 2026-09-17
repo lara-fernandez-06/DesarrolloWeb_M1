@@ -24,40 +24,40 @@ function generateMap(dimension=defaultDim, treasures=defaultTreasure){
 
 function createMatrix(dimension=defaultDim){
 
-    var tableString="";
+    let gridString="";
 
     infoMatrix = Array(dimension);
-    for(var i=0; i<dimension; i++){
+    for(let i=0; i<dimension; i++){
 
         infoMatrix[i] = Array(dimension).fill(0);
-        tableString+="<tr>";
+        gridString+="<tr>";
 
-        for(var j=0; j<dimension; j++){
-            var pos = i*dimension + j;
+        for(let j=0; j<dimension; j++){
+            let pos = i*dimension + j;
             //dar un umero a cada celda?
-            tableString+="<td onclick='manageLeftClick()'></td>";
+            gridString+="<td onclick='manageLeftClick()'></td>";
         }
 
-        tableString+="</tr>";
+        gridString+="</tr>";
     }
 
-    document.getElementById('board').innerHTML = tableString;
+    document.getElementById('board').innerHTML = gridString;
     
 }
 
 function generateTreasures(dimension=defaultDim, treasures=defaultTreasure){
     
-    var cont=0;
-    var max=dimension*dimension; //para evitar hacer esta operacion todo el rato
+    let cont=0;
+    let max=dimension*dimension; //para evitar hacer esta operacion todo el rato
     //hasta que todas los tesoros hayan sido colocadas
 
     while(cont<treasures){
 
-        var pos=Math.floor(Math.random()*max); //numero de la casilla de la mina
+        let pos=Math.floor(Math.random()*max); //numero de la casilla de la mina
         
         //posicion en la matriz
-        var i = Math.floor(pos/dimension);
-        var j = pos - i * dimension;
+        let i = Math.floor(pos/dimension);
+        let j = pos - i * dimension;
 
         if(infoMatrix[i][j] != -1){
             infoMatrix[i][j] = -1;
@@ -69,24 +69,24 @@ function generateTreasures(dimension=defaultDim, treasures=defaultTreasure){
 
 function generateMapNumbers(dimension=defaultDim){
 
-    // [] [] []
-    // [] [x] []
-    // [] [] []
+    // [] [] [] [] []
+    // [] [x] [] [9] []
+    // [] [] [] [] []
 
     const rodeoX = [-1, 0, 1, 1, 1, 0, -1, -1];
     const rodeoY = [-1, -1, -1, 0, 1, 1, 1, 0];
 
     //recorremos toda la matriz, mirando alrededor de la casilla actual para contar los tesoros
-    for(var i = 0; i<infoMatrix.length; i++){
-        for(var j = 0; j<infoMatrix[i].length; j++){
+    for(let i = 0; i<infoMatrix.length; i++){
+        for(let j = 0; j<infoMatrix[i].length; j++){
 
             //si ya es un tesoro, no hace falta hacer nada
             if(infoMatrix[i][j]!=-1){
                 
-                var cont = 0;
-                for(var k=0; k<8; k++){
-                    var nuevaI = i+rodeoX[k];
-                    var nuevaJ = j+rodeoY[k];
+                let cont = 0;
+                for(let k=0; k<8; k++){
+                    let nuevaI = i+rodeoX[k];
+                    let nuevaJ = j+rodeoY[k];
 
                     //miramos que lo que estamos comprobanod esta dentro del tablero
                     if(nuevaI>=0 && nuevaJ >=0 && nuevaI<dimension && nuevaJ<dimension){
@@ -110,9 +110,9 @@ function generateMapNumbers(dimension=defaultDim){
 //funcion para debug
 function printMatrix(matrix){
 
-    for(var i = 0; i<matrix.length; i++){
-        var string = i+": ";
-        for(var j = 0; j<matrix[i].length; j++){
+    for(let i = 0; i<matrix.length; i++){
+        let string = i+": ";
+        for(let j = 0; j<matrix[i].length; j++){
             string += matrix[i][j]+" ";
         }
         console.log(string);
