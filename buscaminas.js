@@ -2,6 +2,8 @@ const defaultDimX=14;
 const defaultDimY=18;
 const defaultTreasure=40;
 
+let infoMatrix;
+
 
 //dimension por defecto es 18x18
 function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, treasures=defaultTreasure){
@@ -10,7 +12,7 @@ function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, treasures=d
     if(treasures>=dimensionX*dimensionY) treasures = Math.floor(0.25*dimensionX*dimensionY);
 
     //inicializamos matriz
-    const infoMatrix = createMatrix(dimensionX, dimensionY);
+    infoMatrix = createMatrix(dimensionX, dimensionY);
 
     //primero rellenamos la matriz que guarda la información (donde están los tesoros (-1) y los números)
     generateTreasures(infoMatrix, treasures);
@@ -25,19 +27,19 @@ function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, treasures=d
 function createMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
 
     let gridString="";
-
     let infoMatrix = Array(dimensionX);
+
     for(let i=0; i<dimensionX; i++){
 
         infoMatrix[i] = Array(dimensionY).fill(0);
-        gridString+="<tr>";
+        gridString+="<div class='row'>";
 
         for(let j=0; j<dimensionY; j++){
             //dar un umero a cada celda? parametros en la funcion
-            gridString+="<td onclick='manageLeftClick()'></td>";
+            gridString+="<div onclick='boardLeftClick(${i}, ${j})'></div>";
         }
 
-        gridString+="</tr>";
+        gridString+="</div>";
     }
 
     document.getElementById('board').innerHTML = gridString;
@@ -121,7 +123,12 @@ function printMatrix(matrix){
 
 }
 
-function manageLeftClick(){
-    alert("click izquierdo");
+function boardLeftClick(i=-1, j=-1){
+    if(i<0 || j<0){
+        console.error("Error");
+        return;
+    } 
+
+    
     
 }
