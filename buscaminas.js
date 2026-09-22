@@ -23,7 +23,7 @@ function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defau
     infoMatrix = createMatrix(dimensionX, dimensionY);
 
     //primero rellenamos la matriz que guarda la información (donde están las minas (-1) y los números)
-    generatemines(infoMatrix, mines);
+    generateMines(infoMatrix, mines);
 
     //ponemos los numeros segun el numero de minas que tengan alrededor
     generateMapNumbers(infoMatrix);
@@ -36,7 +36,6 @@ function createMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
 
     let gridString="";
     let infoMatrix = Array(dimensionX);
-    const cellInfo = {mineNumber:0, discovered: false, flagged:false};
 
     for(let i=0; i<dimensionX; i++){
 
@@ -154,6 +153,8 @@ function boardLeftClick(i=-1, j=-1){
 
     infoMatrix[i][j].mineNumber===-1 ? alert("BOOM") : infoMatrix[i][j].mineNumber===0 ? clearZeroes(i, j) : revealNumber(i, j);
 
+    checkWin();
+
 }
 
 function revealNumber(i=-1, j=-1){
@@ -165,6 +166,7 @@ function revealNumber(i=-1, j=-1){
     const cell = board.children[i].children[j];
 
     if(infoMatrix[i][j].mineNumber!==0) cell.innerHTML=infoMatrix[i][j].mineNumber;
+    infoMatrix[i][j].discovered = true;
 
     //TEMP
     (i+j)%2 ? cell.style.backgroundColor = '#d8a48f' : cell.style.backgroundColor = '#bb8588';
@@ -211,11 +213,26 @@ function clearZeroes(i=-1, j=-1){
 
         }
 
-        queue.shift();
+        queue.shift(); //como un pop pero quita el primer elemento
 
     }
 
 
+}
+
+function checkWin(){
+
+    //ganamos cuando todas las casillas que no son minas han sido descubiertas.
+    //este bool sirve para parar de leer la matriz cuando encontramos una casilla que no cumple esta condicion
+    possibleWin = true;
+
+    for(let i=0; i<infoMatrix.length && possibleWin; i++){
+        for(let j=0; j<infoMatrix[0].length && possibleWin; j++){
+            if(infoMatrix[i][j].mineNumber !== -1) possibleWin = infoMatrix[i][j].discovered;
+        }
+    }
+
+    if(possibleWin) alert("HAS GANADO!!!!!!!");
 }
 
 function boardRightClick(event, i=-1, j=-1){
@@ -224,12 +241,13 @@ function boardRightClick(event, i=-1, j=-1){
         console.error("Error");
         return;
     } 
+
+    //al ponerlo antes que el return evitamos que aparezca el context menu si se intenta poner una bandera donde no se puede
+    event.preventDefault(); 
+
     if(infoMatrix[i][j].discovered == true) return;
 
     const cell = board.children[i].children[j];
-
-    event.preventDefault();
-
     
     infoMatrix[i][j].flagged ? cell.style.backgroundImage = 'none' :cell.style.backgroundImage = "url('media/img/flag.png')";
     
