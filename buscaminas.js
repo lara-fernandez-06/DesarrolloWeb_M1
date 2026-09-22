@@ -1,6 +1,6 @@
 const defaultDimX=14;
 const defaultDimY=18;
-const defaultTreasure=40;
+const defaultMines=40;
 
 /*COLORES TABLERO*/
 const unrevealedColor = 0;
@@ -14,18 +14,18 @@ let infoMatrix;
 
 
 //dimension por defecto es 14x18
-function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, treasures=defaultTreasure){
+function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defaultMines){
     
-    //control de errores: no puede haber mas tesoros que el cuadrado de la dim (los tesoros seran un 25% del tablero)
-    if(treasures>=dimensionX*dimensionY) treasures = Math.floor(0.25*dimensionX*dimensionY);
+    //control de errores: no puede haber mas minas que el cuadrado de la dim (las minas seran un 25% del tablero)
+    if(mines>=dimensionX*dimensionY) mines = Math.floor(0.25*dimensionX*dimensionY);
 
     //inicializamos matriz
     infoMatrix = createMatrix(dimensionX, dimensionY);
 
-    //primero rellenamos la matriz que guarda la información (donde están los tesoros (-1) y los números)
-    generateTreasures(infoMatrix, treasures);
+    //primero rellenamos la matriz que guarda la información (donde están las minas (-1) y los números)
+    generatemines(infoMatrix, mines);
 
-    //ponemos los numeros segun el numero de tesoros que tengan alrededor
+    //ponemos los numeros segun el numero de minas que tengan alrededor
     generateMapNumbers(infoMatrix);
 
     printMatrix(infoMatrix);
@@ -36,14 +36,15 @@ function createMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
 
     let gridString="";
     let infoMatrix = Array(dimensionX);
-    /*const cellInfo = {mineNumber:0, discovered: false, flagged:false};*/
+    const cellInfo = {mineNumber:0, discovered: false, flagged:false};
 
     for(let i=0; i<dimensionX; i++){
 
-        infoMatrix[i] = Array(dimensionY).fill(0);
+        infoMatrix[i] = [];
         gridString+="<div class='row'>";
 
         for(let j=0; j<dimensionY; j++){
+            infoMatrix[i][j] = {mineNumber:0, discovered: false, flagged:false};
             //casiilas pares impares
             gridString+=`<div class='cell `;
             (i+j)%2 ? gridString+=`odd' `: gridString+=`even' `;
@@ -65,13 +66,13 @@ function createMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
     
 }
 
-function generateTreasures(infoMatrix = createMatrix(defaultDimX, defaultDimY), treasures=defaultTreasure){
+function generateMines(infoMatrix = createMatrix(defaultDimX, defaultDimY), mines=defaultMines){
     
     let cont=0;
     let max=infoMatrix.length*infoMatrix[0].length; //para evitar hacer esta operacion todo el rato
-    //hasta que todas los tesoros hayan sido colocadas
+    //hasta que todas las minas hayan sido colocadas
 
-    while(cont<treasures){
+    while(cont<mines){
 
         //numero de casilla
         let num=Math.floor(Math.random()*max); //numero de la casilla de la mina
@@ -82,8 +83,8 @@ function generateTreasures(infoMatrix = createMatrix(defaultDimX, defaultDimY), 
         /*let i = Math.floor(pos/infoMatrix[0].length);
         let j = pos - i * infoMatrix[0].length;*/
 
-        if(infoMatrix[positions[0]][positions[1]] !== -1){
-            infoMatrix[positions[0]][positions[1]] = -1;
+        if(infoMatrix[positions[0]][positions[1]].mineNumber !== -1){
+            infoMatrix[positions[0]][positions[1]].mineNumber = -1;
             cont++;
         }
     }
@@ -99,12 +100,12 @@ function generateMapNumbers(infoMatrix = createMatrix(defaultDim)){
     const rodeoX = [-1, 0, 1, 1, 1, 0, -1, -1];
     const rodeoY = [-1, -1, -1, 0, 1, 1, 1, 0];
 
-    //recorremos toda la matriz, mirando alrededor de la casilla actual para contar los tesoros
+    //recorremos toda la matriz, mirando alrededor de la casilla actual para contar las minas
     for(let i = 0; i<infoMatrix.length; i++){
         for(let j = 0; j<infoMatrix[i].length; j++){
 
             //si ya es un tesoro, no hace falta hacer nada
-            if(infoMatrix[i][j]!==-1){
+            if(infoMatrix[i][j].mineNumber!==-1){
                 
                 let cont = 0;
                 for(let k=0; k<8; k++){
@@ -114,12 +115,12 @@ function generateMapNumbers(infoMatrix = createMatrix(defaultDim)){
                     //miramos que lo que estamos comprobanod esta dentro del tablero
                     if(nuevaI>=0 && nuevaJ >=0 && nuevaI<infoMatrix.length && nuevaJ<infoMatrix[0].length){
                         //si hay tesoro, aumenta el contador
-                        if(infoMatrix[nuevaI][nuevaJ]===-1)cont++;
+                        if(infoMatrix[nuevaI][nuevaJ].mineNumber===-1)cont++;
                     }
 
                 }
 
-                infoMatrix[i][j] = cont;
+                infoMatrix[i][j].mineNumber = cont;
 
             }
 
@@ -136,7 +137,7 @@ function printMatrix(matrix){
     for(let i = 0; i<matrix.length; i++){
         let string = i+": ";
         for(let j = 0; j<matrix[i].length; j++){
-            string += matrix[i][j]+" ";
+            string += matrix[i][j].mineNumber+" ";
         }
         console.log(string);
     }
@@ -149,7 +150,9 @@ function boardLeftClick(i=-1, j=-1){
         return;
     } 
 
-    infoMatrix[i][j]===-1 ? alert("BOOM") : infoMatrix[i][j]===0 ? clearZeroes(i, j) : revealNumber(i, j);
+    if(infoMatrix[i][j].flagged) return; //no se puede liberar si tienes una bandera
+
+    infoMatrix[i][j].mineNumber===-1 ? alert("BOOM") : infoMatrix[i][j].mineNumber===0 ? clearZeroes(i, j) : revealNumber(i, j);
 
 }
 
@@ -161,7 +164,7 @@ function revealNumber(i=-1, j=-1){
 
     const cell = board.children[i].children[j];
 
-    if(infoMatrix[i][j]!==0) cell.innerHTML=infoMatrix[i][j];
+    if(infoMatrix[i][j].mineNumber!==0) cell.innerHTML=infoMatrix[i][j].mineNumber;
 
     //TEMP
     (i+j)%2 ? cell.style.backgroundColor = '#d8a48f' : cell.style.backgroundColor = '#bb8588';
@@ -200,7 +203,7 @@ function clearZeroes(i=-1, j=-1){
                 const boolVisited = !(visited.includes(num));
                 const boolQ = !(queue.includes(num));
 
-                if(infoMatrix[nuevaI][nuevaJ]===0 &&  boolVisited && boolQ) queue.push(num);
+                if(infoMatrix[nuevaI][nuevaJ].mineNumber===0 &&  boolVisited && boolQ) queue.push(num);
 
                 revealNumber(nuevaI, nuevaJ);
 
@@ -221,13 +224,16 @@ function boardRightClick(event, i=-1, j=-1){
         console.error("Error");
         return;
     } 
+    if(infoMatrix[i][j].discovered == true) return;
+
+    const cell = board.children[i].children[j];
 
     event.preventDefault();
 
     
-    board.children[i].children[j].style.backgroundImage = "url('media/img/flag.png')";
+    infoMatrix[i][j].flagged ? cell.style.backgroundImage = 'none' :cell.style.backgroundImage = "url('media/img/flag.png')";
     
-
+    infoMatrix[i][j].flagged = !infoMatrix[i][j].flagged;
 }
 
 function getPostionFromNumber(num){
