@@ -6,10 +6,17 @@
 
 /*html*/
 body{
-    background-color: #fbe4bd;
     height: 100%;
     overflow: hidden;
 
+}
+
+.bodyBackgroundDefault{
+    background-color: #ffffff;
+}
+
+.bodyBackgroundDark{
+    background-color: #181a1b;
 }
 
 header{
@@ -20,7 +27,10 @@ header{
     /*texto*/
     font-family: "pirate";
     font-size: 5em;
-    color: #5d768b;
+}
+
+.headerColorDefault{
+    color: #588157;
 }
 
 main{
@@ -29,8 +39,36 @@ main{
     overflow: hidden;
 }
 
+#gameheader{
+    height: 6vh;
+    background-color: #718355;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#mineCounterContainer{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+}
+
+#mineCounter{
+    font-family: "pirate";
+    aspect-ratio: 1 / 1;
+    margin: 1vw;
+}
+
+#mineCounterFlag{
+    aspect-ratio: 1 / 1;
+    height: 4vh;
+    margin: 1vw;
+}
+
 #board{
-    width: 40vw;
+    width: 35vw;
     min-width: 600px;
 
     display: grid;
@@ -54,20 +92,20 @@ main{
 }
 
 .oddUndiscoveredDefault{
-    background-color: #728c5a;
+    background-color: #87986a;
 }
 
 .evenUndiscoveredDefault{
-    background-color: #8ba473;
+    background-color: #97a97c;
 }
 
 .oddDiscoveredDefault{
     
-    background-color: #d7b899;
+    background-color: #ddb892;
 }
 
 .evenDiscoveredDefault{
-    background-color: #e3c09e;;
+    background-color: #ebcaa9;;
 }
 
 .flagged{

@@ -8,14 +8,17 @@ const lightDefaultPalette = {
     oddUndiscoveredClass: "oddUndiscoveredDefault",
     evenDiscoveredClass: "evenDiscoveredDefault",
     oddDiscoveredClass: "oddDiscoveredDefault",
+    bodyBackgroundClass: "bodyBackgroundDefault"
 }
 
 //aqui guardaremos la informacion de los colores/modo que se este utilizando ahora
 let currentPalette = lightDefaultPalette; //esta sera la por defecto 
 
-const board = document.getElementById("board");
+const board = document.querySelector("#board");
 let infoMatrix;
 
+
+generateMap();
 
 //dimension por defecto es 14x18
 function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defaultMines){
@@ -23,20 +26,23 @@ function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defau
     //control de errores: no puede haber mas minas que el cuadrado de la dim (las minas seran un 25% del tablero)
     if(mines>=dimensionX*dimensionY) mines = Math.floor(0.25*dimensionX*dimensionY);
 
-    //inicializamos matriz
-    infoMatrix = createMatrix(dimensionX, dimensionY);
+    //inicializamos matriz logica
+    infoMatrix = createInfoMatrix(dimensionX, dimensionY);
+
+    //creamos el tablero en la web
+    createWebMatrix(dimensionX, dimensionY, mines);
 
     //primero rellenamos la matriz que guarda la información (donde están las minas (-1) y los números)
-    generateMines(infoMatrix, mines);
+    generateMines(mines);
 
     //ponemos los numeros segun el numero de minas que tengan alrededor
-    generateMapNumbers(infoMatrix);
+    generateMapNumbers();
 
     printMatrix(infoMatrix);
 
 }
 
-function createMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
+function createInfoMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
 
     let gridString="";
     let infoMatrix = Array(dimensionX);
@@ -44,22 +50,12 @@ function createMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
     for(let i=0; i<dimensionX; i++){
 
         infoMatrix[i] = [];
-        gridString+="<div class='row'>";
 
         for(let j=0; j<dimensionY; j++){
             infoMatrix[i][j] = {mineNumber:0, discovered: false, flagged:false};
-            //casiilas pares impares
-            gridString+=`<div class='cell `;
-            (i+j)%2 ? gridString+=`${currentPalette.oddUndiscoveredClass}' `: gridString+=`${currentPalette.evenUndiscoveredClass}' `;
-            gridString+=`onclick='boardLeftClick(${i}, ${j})' oncontextmenu='boardRightClick(event, ${i}, ${j})'></div>`;
 
         }
-
-        gridString+="</div>";
     }
-
-    
-    board.innerHTML = gridString;
 
     //esto crea una variable en board que pueden usar todos sus hijos
     board.style.setProperty("--columns", dimensionY);
@@ -69,12 +65,48 @@ function createMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
     
 }
 
-function generateMines(infoMatrix = createMatrix(defaultDimX, defaultDimY), mines=defaultMines){
+function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defaultMines){
+
+    for(let i=0; i<dimensionX; i++){
+        const row = document.createElement("div");
+        row.classList.add("row");
+        board.appendChild(row);
+
+        for(let j=0; j<dimensionY; j++){
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            (i+j)%2 ? cell.classList.add(currentPalette.oddUndiscoveredClass) : cell.classList.add(currentPalette.evenUndiscoveredClass);
+            //pongo solo row porque se que quiero que el hijo se añada a la fila que acabo de crear
+            row.appendChild(cell);
+        }
+
+    }
+
+    document.querySelector("#mineCounter").textContent = mines;
+
+    //click izquierdo
+    board.addEventListener("click", (e) =>{
+        const cell = e.target.closest("div");
+        const positions = findBoardPosition(cell);
+        boardLeftClick(positions[0], positions[1]);
+    })
+
+    //click derecho
+    board.addEventListener("contextmenu", (e) =>{
+        const cell = e.target.closest("div");
+        e.preventDefault(); 
+        const positions = findBoardPosition(cell);
+        boardRightClick(positions[0], positions[1]);
+    })
+
+}
+
+function generateMines(mines=defaultMines){
     
     let cont=0;
     let max=infoMatrix.length*infoMatrix[0].length; //para evitar hacer esta operacion todo el rato
-    //hasta que todas las minas hayan sido colocadas
 
+    //hasta que todas las minas hayan sido colocadas
     while(cont<mines){
 
         //numero de casilla
@@ -82,9 +114,6 @@ function generateMines(infoMatrix = createMatrix(defaultDimX, defaultDimY), mine
         
         //calculamos las posiciones en la matriz (i, j)
         const positions = getPostionFromNumber(num);
-
-        /*let i = Math.floor(pos/infoMatrix[0].length);
-        let j = pos - i * infoMatrix[0].length;*/
 
         if(infoMatrix[positions[0]][positions[1]].mineNumber !== -1){
             infoMatrix[positions[0]][positions[1]].mineNumber = -1;
@@ -94,7 +123,7 @@ function generateMines(infoMatrix = createMatrix(defaultDimX, defaultDimY), mine
     
 }
 
-function generateMapNumbers(infoMatrix = createMatrix(defaultDim)){
+function generateMapNumbers(){
 
     // [] [] [] [] []
     // [] [x] [] [] []
@@ -147,6 +176,29 @@ function printMatrix(matrix){
 
 }
 
+
+function findBoardPosition(cell){
+
+    //para buscar la posicion i hay que mirar los hermanos de las filas, padres de las casillas
+    let rowSibling = cell.parentElement;
+    let cellSibling = cell;
+    let i=0;
+    let j = 0;
+
+    while(rowSibling.previousElementSibling !== null){
+        rowSibling = rowSibling.previousElementSibling;
+        i++
+    }
+
+    while(cellSibling.previousElementSibling!==null){
+        cellSibling = cellSibling.previousElementSibling;
+        j++;
+    }
+
+    return [i, j];
+
+}
+
 function boardLeftClick(i=-1, j=-1){
     if(i<0 || j<0){
         console.error("Error");
@@ -169,10 +221,9 @@ function revealNumber(i=-1, j=-1){
 
     const cell = board.children[i].children[j];
 
-    if(infoMatrix[i][j].mineNumber!==0) cell.innerHTML=infoMatrix[i][j].mineNumber;
+    if(infoMatrix[i][j].mineNumber!==0) cell.textContent = infoMatrix[i][j].mineNumber;
     infoMatrix[i][j].discovered = true;
 
-    //TEMP
     if((i+j)%2){
         cell.classList.remove(currentPalette.oddUndiscoveredClass);
         //para evitar que una clase se añada muchas veces, comprobamos antes si la tiene
@@ -180,6 +231,17 @@ function revealNumber(i=-1, j=-1){
     }else{
         cell.classList.remove(currentPalette.evenUndiscoveredClass);
         if(!cell.classList.contains(currentPalette.evenDiscoveredClass)) cell.classList.add(currentPalette.evenDiscoveredClass); 
+    }
+
+    //para que si se revela una casilla con los ceros, no se quede la bandera inutilizada
+    if(infoMatrix[i][j].flagged){
+        const counter = document.querySelector("#mineCounter");
+        const mines = Number(counter.textContent);
+
+        counter.textContent = mines + 1;
+        cell.classList.remove("flagged");
+
+        infoMatrix[i][j].flagged = false;
     }
 
 }
@@ -231,6 +293,31 @@ function clearZeroes(i=-1, j=-1){
 
 }
 
+function boardRightClick(i=-1, j=-1){
+
+    if(i<0 || j<0){
+        console.error("Error");
+        return;
+    }
+
+    if(infoMatrix[i][j].discovered == true) return;
+
+    const counter = document.querySelector("#mineCounter");
+    const mines = Number(counter.textContent);
+
+    if(mines<=0) return; //si ya no quedan banderas no se pueden poner mas
+
+    const cell = board.children[i].children[j];
+    
+    cell.classList.toggle("flagged");
+
+    //si ya tenia bandera, se la quita -> sumamos una al contador
+    infoMatrix[i][j].flagged ? counter.textContent = mines+1 : counter.textContent = mines-1;
+
+    infoMatrix[i][j].flagged = !infoMatrix[i][j].flagged;
+
+}
+
 function checkWin(){
 
     //ganamos cuando todas las casillas que no son minas han sido descubiertas.
@@ -246,28 +333,6 @@ function checkWin(){
     if(possibleWin) alert("HAS GANADO!!!!!!!");
 }
 
-function boardRightClick(event, i=-1, j=-1){
-
-    if(i<0 || j<0){
-        console.error("Error");
-        return;
-    } 
-
-    //al ponerlo antes que el return evitamos que aparezca el context menu si se intenta poner una bandera donde no se puede
-    event.preventDefault(); 
-
-    if(infoMatrix[i][j].discovered == true) return;
-
-    const cell = board.children[i].children[j];
-
-    if(infoMatrix[i][j].flagged){
-        cell.classList.remove("flagged");
-    }else{
-        cell.classList.add("flagged");
-    }
-    
-    infoMatrix[i][j].flagged = !infoMatrix[i][j].flagged;
-}
 
 function getPostionFromNumber(num){
 
@@ -286,3 +351,6 @@ function getNumberFromPositions(i, j){
 
 }
 
+function changeMode(){
+
+}

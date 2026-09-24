@@ -10,14 +10,16 @@
         <script src="buscaminas.js" type="text/javascript" defer></script>
     </head>
 
-    <body onload="generateMap()">
+    <body class="bodyBackgroundDefault">
 
-        <header>BUSCAMINAS</header>
+        <header class="headerColorDefault">BUSCAMINAS</header>
 
         <main>
             <aside></aside>
             <div id="game">
-                <div id="gameheader"></div>
+                <div id="gameheader">
+                    <div id="mineCounterContainer"><p id="mineCounter"></p><img id="mineCounterFlag" src="media/img/flag.png"></div>
+                </div>
                 <div id="board"></div>
             </div>
             <aside></aside>
