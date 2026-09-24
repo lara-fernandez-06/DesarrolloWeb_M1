@@ -3,11 +3,15 @@ const defaultDimY=18;
 const defaultMines=40;
 
 /*COLORES TABLERO*/
-const unrevealedColor = 0;
-const revealedColor = 0;
-const lightDefaultPalette = [
-    []
-]
+const lightDefaultPalette = {
+    evenUndiscoveredClass: "evenUndiscoveredDefault",
+    oddUndiscoveredClass: "oddUndiscoveredDefault",
+    evenDiscoveredClass: "evenDiscoveredDefault",
+    oddDiscoveredClass: "oddDiscoveredDefault",
+}
+
+//aqui guardaremos la informacion de los colores/modo que se este utilizando ahora
+let currentPalette = lightDefaultPalette; //esta sera la por defecto 
 
 const board = document.getElementById("board");
 let infoMatrix;
@@ -46,7 +50,7 @@ function createMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
             infoMatrix[i][j] = {mineNumber:0, discovered: false, flagged:false};
             //casiilas pares impares
             gridString+=`<div class='cell `;
-            (i+j)%2 ? gridString+=`odd' `: gridString+=`even' `;
+            (i+j)%2 ? gridString+=`${currentPalette.oddUndiscoveredClass}' `: gridString+=`${currentPalette.evenUndiscoveredClass}' `;
             gridString+=`onclick='boardLeftClick(${i}, ${j})' oncontextmenu='boardRightClick(event, ${i}, ${j})'></div>`;
 
         }
@@ -169,7 +173,14 @@ function revealNumber(i=-1, j=-1){
     infoMatrix[i][j].discovered = true;
 
     //TEMP
-    (i+j)%2 ? cell.style.backgroundColor = '#d8a48f' : cell.style.backgroundColor = '#bb8588';
+    if((i+j)%2){
+        cell.classList.remove(currentPalette.oddUndiscoveredClass);
+        //para evitar que una clase se añada muchas veces, comprobamos antes si la tiene
+        if(!cell.classList.contains(currentPalette.oddDiscoveredClass)) cell.classList.add(currentPalette.oddDiscoveredClass);
+    }else{
+        cell.classList.remove(currentPalette.evenUndiscoveredClass);
+        if(!cell.classList.contains(currentPalette.evenDiscoveredClass)) cell.classList.add(currentPalette.evenDiscoveredClass); 
+    }
 
 }
 
@@ -192,7 +203,7 @@ function clearZeroes(i=-1, j=-1){
     while(queue.length>0){
 
         visited.push(queue[0]);
-        positions = getPostionFromNumber(queue[0]);
+        const positions = getPostionFromNumber(queue[0]);
 
         for(let k=0; k<8; k++){
             let nuevaI = positions[0]+rodeoX[k];
@@ -248,8 +259,12 @@ function boardRightClick(event, i=-1, j=-1){
     if(infoMatrix[i][j].discovered == true) return;
 
     const cell = board.children[i].children[j];
-    
-    infoMatrix[i][j].flagged ? cell.style.backgroundImage = 'none' :cell.style.backgroundImage = "url('media/img/flag.png')";
+
+    if(infoMatrix[i][j].flagged){
+        cell.classList.remove("flagged");
+    }else{
+        cell.classList.add("flagged");
+    }
     
     infoMatrix[i][j].flagged = !infoMatrix[i][j].flagged;
 }

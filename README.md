@@ -1,7 +1,7 @@
 # DesarrolloWeb_M1
 
----USO DE IA---
-Lo principal para lo que he usado IA es para hacer el tablero en css con casillas que tuvieran un ratio 1/1 y que no cambiasen de tamaño si cambiaba la pantalla. Sobre el mismo tema, la he utilizado para buscar información sobre la propiedad display: grid en css, y en un par de cuestiones sobre métodos de javascript, como el .shift() para los arrays o .inlcudes() para ver si existe un elemento en una lista.
+---DECLARACION USO DE IA---
+He utilizado ChatGPT. Lo principal para lo que he usado IA es para hacer el tablero en css con casillas que tuvieran un ratio 1/1 y que no cambiasen de tamaño si cambiaba la pantalla. Sobre el mismo tema, la he utilizado para buscar información sobre la propiedad display: grid en css, y en un par de cuestiones sobre métodos de javascript, como el .shift() para los arrays o .inlcudes() para ver si existe un elemento en una lista.
 
 Ejemplos: 
 "cómo hago en js un pop para el primer elemento"

@@ -48,21 +48,33 @@ main{
     justify-content: center;
     align-items: center;
 
-    background-size: 75%;
-    background-position: center;
-    background-repeat: no-repeat;
+    
 
     font-family: "pirate";
 }
 
-.odd{
-    /*background-color: #d8c09d;*/
-    background-color: #d6ce93;
+.oddUndiscoveredDefault{
+    background-color: #728c5a;
 }
 
-.even{
-    /*background-color: #b58b63;*/
-    background-color: #a3a380;
+.evenUndiscoveredDefault{
+    background-color: #8ba473;
+}
+
+.oddDiscoveredDefault{
+    
+    background-color: #d7b899;
+}
+
+.evenDiscoveredDefault{
+    background-color: #e3c09e;;
+}
+
+.flagged{
+    background-image: url('media/img/flag.png');
+    background-size: 75%;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 
