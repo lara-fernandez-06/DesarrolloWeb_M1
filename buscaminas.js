@@ -16,6 +16,7 @@ let currentPalette = lightDefaultPalette; //esta sera la por defecto
 
 const board = document.querySelector("#board");
 let infoMatrix;
+let intervalId;
 
 
 generateMap();
@@ -83,6 +84,17 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
     }
 
     document.querySelector("#mineCounter").textContent = mines;
+    board.addEventListener("click", function(e){
+        let secCounter = 0;
+        intervalId = setInterval(()=>{
+            const chrono = document.querySelector("#chrono")
+            secCounter++;
+            secCounter<10 ? chrono.textContent="00"+secCounter : secCounter<100 ? chrono.textContent="0"+secCounter  : chrono.textContent = secCounter;
+
+            if(secCounter>=999) clearInterval(intervalId);
+        }, 1000)
+
+    }, {once:true});
 
     //click izquierdo
     board.addEventListener("click", (e) =>{

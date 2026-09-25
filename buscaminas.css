@@ -39,7 +39,7 @@ main{
     overflow: hidden;
 }
 
-#gameheader{
+#gameHeader{
     height: 6vh;
     background-color: #718355;
 
@@ -48,23 +48,23 @@ main{
     align-items: center;
 }
 
-#mineCounterContainer{
+.gameHeaderContainer{
     display: flex;
     justify-content: space-around;
     align-items: center;
 
 }
 
-#mineCounter{
+.gameHeaderText{
     font-family: "pirate";
-    aspect-ratio: 1 / 1;
     margin: 1vw;
+    font-size: 1.2em;
 }
 
-#mineCounterFlag{
+.gameHeaderImg{
     aspect-ratio: 1 / 1;
     height: 4vh;
-    margin: 1vw;
+    margin: .25vw;
 }
 
 #board{
