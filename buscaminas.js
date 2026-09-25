@@ -45,7 +45,6 @@ function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defau
 
 function createInfoMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
 
-    let gridString="";
     let infoMatrix = Array(dimensionX);
 
     for(let i=0; i<dimensionX; i++){
@@ -77,6 +76,8 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
             const cell = document.createElement("div");
             cell.classList.add("cell");
             (i+j)%2 ? cell.classList.add(currentPalette.oddUndiscoveredClass) : cell.classList.add(currentPalette.evenUndiscoveredClass);
+            cell.i=i;
+            cell.j=j;
             //pongo solo row porque se que quiero que el hijo se añada a la fila que acabo de crear
             row.appendChild(cell);
         }
@@ -89,26 +90,27 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
         intervalId = setInterval(()=>{
             const chrono = document.querySelector("#chrono")
             secCounter++;
-            secCounter<10 ? chrono.textContent="00"+secCounter : secCounter<100 ? chrono.textContent="0"+secCounter  : chrono.textContent = secCounter;
+
+            if(secCounter<10) chrono.textContent=`00${secCounter}`
+            else if(secCounter<100) chrono.textContent=`0${secCounter}`
+            else chrono.textContent=`${secCounter}`
 
             if(secCounter>=999) clearInterval(intervalId);
         }, 1000)
 
-    }, {once:true});
+    }, {once:true});//solo funciona una vez (sino resetaríamos el chrono con cada click)
 
     //click izquierdo
     board.addEventListener("click", (e) =>{
         const cell = e.target.closest("div");
-        const positions = findBoardPosition(cell);
-        boardLeftClick(positions[0], positions[1]);
+        boardLeftClick(cell.i, cell.j);
     })
 
     //click derecho
     board.addEventListener("contextmenu", (e) =>{
         const cell = e.target.closest("div");
         e.preventDefault(); 
-        const positions = findBoardPosition(cell);
-        boardRightClick(positions[0], positions[1]);
+        boardRightClick(cell.i, cell.j);
     })
 
 }
@@ -185,29 +187,6 @@ function printMatrix(matrix){
         }
         console.log(string);
     }
-
-}
-
-
-function findBoardPosition(cell){
-
-    //para buscar la posicion i hay que mirar los hermanos de las filas, padres de las casillas
-    let rowSibling = cell.parentElement;
-    let cellSibling = cell;
-    let i=0;
-    let j = 0;
-
-    while(rowSibling.previousElementSibling !== null){
-        rowSibling = rowSibling.previousElementSibling;
-        i++
-    }
-
-    while(cellSibling.previousElementSibling!==null){
-        cellSibling = cellSibling.previousElementSibling;
-        j++;
-    }
-
-    return [i, j];
 
 }
 
@@ -334,7 +313,7 @@ function checkWin(){
 
     //ganamos cuando todas las casillas que no son minas han sido descubiertas.
     //este bool sirve para parar de leer la matriz cuando encontramos una casilla que no cumple esta condicion
-    possibleWin = true;
+    let possibleWin = true;
 
     for(let i=0; i<infoMatrix.length && possibleWin; i++){
         for(let j=0; j<infoMatrix[0].length && possibleWin; j++){
