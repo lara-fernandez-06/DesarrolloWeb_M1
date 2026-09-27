@@ -102,13 +102,13 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
 
     //click izquierdo
     board.addEventListener("click", (e) =>{
-        const cell = e.target.closest("div");
+        const cell = e.target.closest(".cell");
         boardLeftClick(cell.i, cell.j);
     })
 
     //click derecho
     board.addEventListener("contextmenu", (e) =>{
-        const cell = e.target.closest("div");
+        const cell = e.target.closest(".cell");
         e.preventDefault(); 
         boardRightClick(cell.i, cell.j);
     })
@@ -127,7 +127,7 @@ function generateMines(mines=defaultMines){
         let num=Math.floor(Math.random()*max); //numero de la casilla de la mina
         
         //calculamos las posiciones en la matriz (i, j)
-        const positions = getPostionFromNumber(num);
+        const positions = getPostionFromNumber(num, infoMatrix[0].length);
 
         if(infoMatrix[positions[0]][positions[1]].mineNumber !== -1){
             infoMatrix[positions[0]][positions[1]].mineNumber = -1;
@@ -198,7 +198,9 @@ function boardLeftClick(i=-1, j=-1){
 
     if(infoMatrix[i][j].flagged) return; //no se puede liberar si tienes una bandera
 
-    infoMatrix[i][j].mineNumber===-1 ? alert("BOOM") : infoMatrix[i][j].mineNumber===0 ? clearZeroes(i, j) : revealNumber(i, j);
+    if(infoMatrix[i][j].mineNumber===-1) alert("BOOM") 
+    else if(infoMatrix[i][j].mineNumber===0) clearZeroes(i, j)
+    else revealNumber(i, j);
 
     checkWin();
 
@@ -324,13 +326,12 @@ function checkWin(){
     if(possibleWin) alert("HAS GANADO!!!!!!!");
 }
 
-
-function getPostionFromNumber(num){
+function getPostionFromNumber(num, dimensionY){
 
     const positions=[];
 
-    positions.push(Math.floor(num/infoMatrix[0].length));
-    positions.push(num - positions[0]*infoMatrix[0].length);
+    positions.push(Math.floor(num/dimensionY));
+    positions.push(num - positions[0]*dimensionY);
 
     return positions;
 
@@ -340,6 +341,12 @@ function getNumberFromPositions(i, j){
 
     return i*infoMatrix[0].length + j;
 
+//esto es un .includes que mira si un array tiene un objeto que guarda una posicion(i, j)
+function includesPosition(array, other){
+    //obj es cada uno de los elementos del array
+    return array.some(function(obj){
+        return obj.i === other.i && obj.j === other.j;
+    }, other);
 }
 
 function changeMode(){
