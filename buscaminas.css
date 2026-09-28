@@ -91,6 +91,7 @@ main{
     font-family: "pirate";
 }
 
+/*default board palette*/
 .oddUndiscoveredDefault{
     background-color: #87986a;
 }
@@ -107,6 +108,28 @@ main{
 .evenDiscoveredDefault{
     background-color: #ebcaa9;;
 }
+
+/*dark board palette*/
+.oddUndiscoveredDark{
+    /*background-color: #222222;*/
+    background-color: #1b314c;
+}
+
+.evenUndiscoveredDark{
+    /*background-color: #343434;*/
+    background-color: #243e5d;
+}
+
+.oddDiscoveredDark{    
+    /*background-color: #535353;*/
+    background-color: #4d759f;
+}
+
+.evenDiscoveredDark{
+    /*background-color: #606060;*/
+    background-color: #7390b2;
+}
+
 
 .flagged{
     background-image: url('media/img/flag.png');

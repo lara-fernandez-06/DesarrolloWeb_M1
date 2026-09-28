@@ -11,6 +11,14 @@ const lightDefaultPalette = {
     bodyBackgroundClass: "bodyBackgroundDefault"
 }
 
+const darkPalette = {
+    evenUndiscoveredClass: "evenUndiscoveredDark",
+    oddUndiscoveredClass: "oddUndiscoveredDark",
+    evenDiscoveredClass: "evenDiscoveredDark",
+    oddDiscoveredClass: "oddDiscoveredDark",
+    bodyBackgroundClass: "bodyBackgroundDark"
+}
+
 //aqui guardaremos la informacion de los colores/modo que se este utilizando ahora
 let currentPalette = lightDefaultPalette; //esta sera la por defecto 
 
@@ -218,12 +226,9 @@ function revealNumber(i=-1, j=-1){
     infoMatrix[i][j].discovered = true;
 
     if((i+j)%2){
-        cell.classList.remove(currentPalette.oddUndiscoveredClass);
-        //para evitar que una clase se añada muchas veces, comprobamos antes si la tiene
-        if(!cell.classList.contains(currentPalette.oddDiscoveredClass)) cell.classList.add(currentPalette.oddDiscoveredClass);
+        exchangeClasses(cell, currentPalette.oddUndiscoveredClass, currentPalette.oddDiscoveredClass);
     }else{
-        cell.classList.remove(currentPalette.evenUndiscoveredClass);
-        if(!cell.classList.contains(currentPalette.evenDiscoveredClass)) cell.classList.add(currentPalette.evenDiscoveredClass); 
+        exchangeClasses(cell, currentPalette.evenUndiscoveredClass, currentPalette.evenDiscoveredClass); 
     }
 
     //para que si se revela una casilla con los ceros, no se quede la bandera inutilizada
@@ -237,6 +242,12 @@ function revealNumber(i=-1, j=-1){
         infoMatrix[i][j].flagged = false;
     }
 
+}
+
+function exchangeClasses(obj, classToRemove, classToAdd){
+    obj.classList.remove(classToRemove);
+    //para evitar que una clase se añada muchas veces, comprobamos antes si la tiene
+    if(!obj.classList.contains(classToAdd)) obj.classList.add(classToAdd); 
 }
 
 function clearZeroes(i=-1, j=-1){
@@ -254,11 +265,11 @@ function clearZeroes(i=-1, j=-1){
 
     revealNumber(i, j);
 
-    queue.push(getNumberFromPositions(i, j));
+    queue.push(getNumberFromPositions(i, j, infoMatrix[0].length));
     while(queue.length>0){
 
         visited.push(queue[0]);
-        const positions = getPostionFromNumber(queue[0]);
+        const positions = getPostionFromNumber(queue[0], infoMatrix[0].length);
 
         for(let k=0; k<8; k++){
             let nuevaI = positions[0]+rodeoX[k];
@@ -266,7 +277,7 @@ function clearZeroes(i=-1, j=-1){
 
             if(nuevaI>=0 && nuevaJ >=0 && nuevaI<infoMatrix.length && nuevaJ<infoMatrix[0].length){
 
-                const num = getNumberFromPositions(nuevaI, nuevaJ);
+                const num = getNumberFromPositions(nuevaI, nuevaJ, infoMatrix[0].length);
 
                 const boolVisited = !(visited.includes(num));
                 const boolQ = !(queue.includes(num));
@@ -337,18 +348,12 @@ function getPostionFromNumber(num, dimensionY){
 
 }
 
-function getNumberFromPositions(i, j){
+function getNumberFromPositions(i, j, dimensionY){
 
-    return i*infoMatrix[0].length + j;
+    return i*dimensionY + j;
 
-//esto es un .includes que mira si un array tiene un objeto que guarda una posicion(i, j)
-function includesPosition(array, other){
-    //obj es cada uno de los elementos del array
-    return array.some(function(obj){
-        return obj.i === other.i && obj.j === other.j;
-    }, other);
 }
 
-function changeMode(){
-
+function changeMode(newPalette){
+    
 }
