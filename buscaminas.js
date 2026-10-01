@@ -4,23 +4,28 @@ const defaultMines=40;
 
 /*COLORES TABLERO*/
 const lightDefaultPalette = {
+    bodyBackgroundClass: "bodyBackgroundDefault",
+    headerColor: "headerColorDefault",
+    gameHeaderBackgroundClass: "gameHeaderColorDefault",
     evenUndiscoveredClass: "evenUndiscoveredDefault",
     oddUndiscoveredClass: "oddUndiscoveredDefault",
     evenDiscoveredClass: "evenDiscoveredDefault",
-    oddDiscoveredClass: "oddDiscoveredDefault",
-    bodyBackgroundClass: "bodyBackgroundDefault"
+    oddDiscoveredClass: "oddDiscoveredDefault"
 }
 
 const darkPalette = {
+    bodyBackgroundClass: "bodyBackgroundDark",
+    headerColor: "headerColorDark",
+    gameHeaderBackgroundClass: "gameHeaderColorDark",
     evenUndiscoveredClass: "evenUndiscoveredDark",
     oddUndiscoveredClass: "oddUndiscoveredDark",
     evenDiscoveredClass: "evenDiscoveredDark",
     oddDiscoveredClass: "oddDiscoveredDark",
-    bodyBackgroundClass: "bodyBackgroundDark"
+    
 }
 
 //aqui guardaremos la informacion de los colores/modo que se este utilizando ahora
-let currentPalette = lightDefaultPalette; //esta sera la por defecto 
+let currentPalette = darkPalette; //esta sera la por defecto 
 
 const board = document.querySelector("#board");
 let infoMatrix;
@@ -40,6 +45,7 @@ function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defau
 
     //creamos el tablero en la web
     createWebMatrix(dimensionX, dimensionY, mines);
+    addColorClasses(currentPalette);
 
     //primero rellenamos la matriz que guarda la información (donde están las minas (-1) y los números)
     generateMines(mines);
@@ -83,9 +89,15 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
         for(let j=0; j<dimensionY; j++){
             const cell = document.createElement("div");
             cell.classList.add("cell");
-            (i+j)%2 ? cell.classList.add(currentPalette.oddUndiscoveredClass) : cell.classList.add(currentPalette.evenUndiscoveredClass);
-            cell.i=i;
-            cell.j=j;
+            if((i+j)%2){
+                //esta clase la incluimos para poder seleccionar solo estas con una query
+                addSingularClass(cell, "odd");
+                //mientras que esta solo le aporta el color
+            }else{
+                addSingularClass(cell, "even");
+            } 
+            cell.dataset.i=i;
+            cell.dataset.j=j;
             //pongo solo row porque se que quiero que el hijo se añada a la fila que acabo de crear
             row.appendChild(cell);
         }
@@ -111,14 +123,14 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
     //click izquierdo
     board.addEventListener("click", (e) =>{
         const cell = e.target.closest(".cell");
-        boardLeftClick(cell.i, cell.j);
+        boardLeftClick(Number(cell.dataset.i), Number(cell.dataset.j));
     })
 
     //click derecho
     board.addEventListener("contextmenu", (e) =>{
         const cell = e.target.closest(".cell");
         e.preventDefault(); 
-        boardRightClick(cell.i, cell.j);
+        boardRightClick(Number(cell.dataset.i), Number(cell.dataset.j));
     })
 
 }
@@ -244,12 +256,6 @@ function revealNumber(i=-1, j=-1){
 
 }
 
-function exchangeClasses(obj, classToRemove, classToAdd){
-    obj.classList.remove(classToRemove);
-    //para evitar que una clase se añada muchas veces, comprobamos antes si la tiene
-    if(!obj.classList.contains(classToAdd)) obj.classList.add(classToAdd); 
-}
-
 function clearZeroes(i=-1, j=-1){
 
     if(i<0 || j<0){
@@ -355,5 +361,65 @@ function getNumberFromPositions(i, j, dimensionY){
 }
 
 function changeMode(newPalette){
-    
+    removeColorClasses(currentPalette);
+    addColorClasses(newPalette);
+}
+
+function exchangeClasses(obj, classToRemove, classToAdd){
+    obj.classList.remove(classToRemove);
+    addSingularClass(obj, classToAdd); 
+}
+
+//estas funciones nos sirven para cambiar la paleta de colores
+//he decidido hacelo asi en vez de con la funcion de intercambiar clases que ya tengo para poder utilizar
+//addColorClasses al cargar la pagina, y no tener algunas de las clases (como las del fondo del body) escritas en el html
+function addColorClasses(palette){
+    addSingularClass(document.querySelector("body"), palette.bodyBackgroundClass);
+    addColorToCell('.odd', palette.oddDiscoveredClass, palette.oddUndiscoveredClass);
+    addColorToCell('.even', palette.evenDiscoveredClass, palette.evenUndiscoveredClass);
+    addSingularClass(document.querySelector("#gameHeader"), palette.gameHeaderBackgroundClass); 
+    addSingularClass(document.querySelector("#header"), palette.headerColor);   
+}
+
+function addClassToMany(querySearch, className){
+    for (const obj of document.querySelectorAll(querySearch)){
+        addSingularClass(obj, className);
+    }
+
+}
+
+
+//esta funcion sirve para poder hacer la distincion entre las casillas descubiertas y las que no
+//la separo para no tener que repetir la logica con las casillas pares e impares
+function addColorToCell(querySearch, discoveredClass, undiscoveredClass){
+    for (const cell of document.querySelectorAll(querySearch)){
+        const i=Number(cell.dataset.i);
+        const j=Number(cell.dataset.j);
+        if(infoMatrix[i][j].discovered) addSingularClass(cell, discoveredClass);
+        else addSingularClass(cell, undiscoveredClass);
+    }
+
+}
+
+function removeColorFromCell(querySearch, discoveredClass, undiscoveredClass){
+    for (const cell of document.querySelectorAll(querySearch)){
+        const i=Number(cell.dataset.i);
+        const j=Number(cell.dataset.j);
+        if(infoMatrix[i][j].discovered) cell.classList.remove(discoveredClass);
+        else cell.classList.remove(undiscoveredClass);
+    }
+
+}
+
+//hacemos la comprobacion de que no tiene ya la clase. como conviene hacerlo cada vez que añadimos una clase, hacemos una funcion
+function addSingularClass(obj, className){
+    if(!obj.classList.contains(className)) obj.classList.add(className);
+}
+
+function removeColorClasses(palette){
+    document.querySelector("body").classList.remove(palette.bodyBackgroundClass);
+    removeColorFromCell('.odd', palette.oddDiscoveredClass, palette.oddUndiscoveredClass);
+    removeColorFromCell('.even', palette.evenDiscoveredClass, palette.evenUndiscoveredClass);
+    document.querySelector("#gameHeader").classList.remove(palette.gameHeaderBackgroundClass); 
+    document.querySelector("#header").classList.remove(palette.headerColor); 
 }

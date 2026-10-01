@@ -16,7 +16,7 @@ body{
 }
 
 .bodyBackgroundDark{
-    background-color: #181a1b;
+    background-color: #121417;
 }
 
 header{
@@ -33,6 +33,10 @@ header{
     color: #588157;
 }
 
+.headerColorDark{
+    color: #28303b;
+}
+
 main{
     display: flex;
     justify-content: space-between;
@@ -41,11 +45,18 @@ main{
 
 #gameHeader{
     height: 6vh;
-    background-color: #718355;
 
     display: flex;
     justify-content: space-around;
     align-items: center;
+}
+
+.gameHeaderColorDefault{
+    background-color: #718355;
+}
+
+.gameHeaderColorDark{
+    background-color: #252B33;
 }
 
 .gameHeaderContainer{
@@ -112,22 +123,22 @@ main{
 /*dark board palette*/
 .oddUndiscoveredDark{
     /*background-color: #222222;*/
-    background-color: #1b314c;
+    background-color: #1c2025;
 }
 
 .evenUndiscoveredDark{
     /*background-color: #343434;*/
-    background-color: #243e5d;
+    background-color: #20252b;
 }
 
 .oddDiscoveredDark{    
     /*background-color: #535353;*/
-    background-color: #4d759f;
+    background-color: #252a30;
 }
 
-.evenDiscoveredDark{
+.evenDiscoveredDark{    
     /*background-color: #606060;*/
-    background-color: #7390b2;
+    background-color: #2c3239;
 }
 
 
