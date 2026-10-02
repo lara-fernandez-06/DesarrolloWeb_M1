@@ -25,7 +25,7 @@ const darkPalette = {
 }
 
 //aqui guardaremos la informacion de los colores/modo que se este utilizando ahora
-let currentPalette = darkPalette; //esta sera la por defecto 
+let currentPalette = lightDefaultPalette; //esta sera la por defecto 
 
 const board = document.querySelector("#board");
 let infoMatrix;
@@ -33,6 +33,11 @@ let intervalId;
 
 
 generateMap();
+document.addEventListener("keydown", (e) => {
+    if(e.key== 'd' || e.key === 'D'){
+        changeMode(darkPalette);
+    }
+})
 
 //dimension por defecto es 14x18
 function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defaultMines){
@@ -52,8 +57,6 @@ function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defau
 
     //ponemos los numeros segun el numero de minas que tengan alrededor
     generateMapNumbers();
-
-    printMatrix(infoMatrix);
 
 }
 
@@ -194,19 +197,6 @@ function generateMapNumbers(){
         }
     }
 
-
-}
-
-//funcion para debug
-function printMatrix(matrix){
-
-    for(let i = 0; i<matrix.length; i++){
-        let string = i+": ";
-        for(let j = 0; j<matrix[i].length; j++){
-            string += matrix[i][j].mineNumber+" ";
-        }
-        console.log(string);
-    }
 
 }
 
