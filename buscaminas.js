@@ -33,20 +33,14 @@ let intervalId;
 let darkMode = false;
 
 
-generateMap();
-document.addEventListener("keydown", (e) => {
-    if(e.key=== 'd' || e.key === 'D'){
-        if(darkMode){
-            currentPalette = lightDefaultPalette;
-            changeMode(lightDefaultPalette);
-        }else{
-            currentPalette = darkPalette;
-            changeMode(darkPalette);
-        }
-        
-        darkMode = !darkMode;
-    }
-})
+startGame();
+
+function startGame(){
+
+    generateMap()
+    addEvents();
+
+}
 
 //dimension por defecto es 14x18
 function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defaultMines){
@@ -117,34 +111,7 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
     }
 
     document.querySelector("#mineCounter").textContent = mines;
-    board.addEventListener("click", function(e){
-        let secCounter = 0;
-        intervalId = setInterval(()=>{
-            const chrono = document.querySelector("#chrono")
-            secCounter++;
-
-            if(secCounter<10) chrono.textContent=`00${secCounter}`
-            else if(secCounter<100) chrono.textContent=`0${secCounter}`
-            else chrono.textContent=`${secCounter}`
-
-            if(secCounter>=999) clearInterval(intervalId);
-        }, 1000)
-
-    }, {once:true});//solo funciona una vez (sino resetaríamos el chrono con cada click)
-
-    //click izquierdo
-    board.addEventListener("click", (e) =>{
-        const cell = e.target.closest(".cell");
-        boardLeftClick(Number(cell.dataset.i), Number(cell.dataset.j));
-    })
-
-    //click derecho
-    board.addEventListener("contextmenu", (e) =>{
-        const cell = e.target.closest(".cell");
-        e.preventDefault(); 
-        boardRightClick(Number(cell.dataset.i), Number(cell.dataset.j));
-    })
-
+    
 }
 
 function generateMines(mines=defaultMines){
@@ -207,6 +174,64 @@ function generateMapNumbers(){
     }
 
 
+}
+
+//esta funcion solo la añadimos para aumentar legibilidad
+function addEvents(){
+    board.addEventListener("click", function(e){
+        let secCounter = 0;
+        intervalId = setInterval(()=>{
+            const chrono = document.querySelector("#chrono")
+            secCounter++;
+
+            if(secCounter<10) chrono.textContent=`00${secCounter}`
+            else if(secCounter<100) chrono.textContent=`0${secCounter}`
+            else chrono.textContent=`${secCounter}`
+
+            if(secCounter>=999) clearInterval(intervalId);
+        }, 1000)
+
+    }, {once:true});//solo funciona una vez (sino resetaríamos el chrono con cada click)
+
+    //click izquierdo
+    board.addEventListener("click", (e) =>{
+        const cell = e.target.closest(".cell");
+        boardLeftClick(Number(cell.dataset.i), Number(cell.dataset.j));
+    })
+
+    //click derecho
+    board.addEventListener("contextmenu", (e) =>{
+        const cell = e.target.closest(".cell");
+        e.preventDefault(); 
+        boardRightClick(Number(cell.dataset.i), Number(cell.dataset.j));
+    })
+
+    //modo oscuro
+    document.addEventListener("keydown", (e) => {
+        if(e.key=== 'd' || e.key === 'D'){
+            if(darkMode){
+                currentPalette = lightDefaultPalette;
+                changeMode(lightDefaultPalette);
+            }else{
+                currentPalette = darkPalette;
+                changeMode(darkPalette);
+            }
+            
+            darkMode = !darkMode;
+        }
+    })
+
+    document.querySelector("#reloadButton").addEventListener("click", (e)=>{
+        resetGame();
+        startGame();
+    })
+
+}
+
+function resetGame(){
+    board.innerHTML="";
+    clearInterval(intervalId);
+    document.querySelector("#chrono").textContent='000';
 }
 
 function boardLeftClick(i=-1, j=-1){
