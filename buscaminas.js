@@ -270,24 +270,22 @@ function clearZeroes(i=-1, j=-1){
 
     revealNumber(i, j);
 
-    queue.push(getNumberFromPositions(i, j, infoMatrix[0].length));
+    queue.push({i:i, j:j});
     while(queue.length>0){
 
         visited.push(queue[0]);
-        const positions = getPostionFromNumber(queue[0], infoMatrix[0].length);
+        const positions = {i:queue[0].i, j:queue[0].j};
 
         for(let k=0; k<8; k++){
-            let nuevaI = positions[0]+rodeoX[k];
-            let nuevaJ = positions[1]+rodeoY[k];
+            let nuevaI = positions.i+rodeoX[k];
+            let nuevaJ = positions.j+rodeoY[k];
 
             if(nuevaI>=0 && nuevaJ >=0 && nuevaI<infoMatrix.length && nuevaJ<infoMatrix[0].length){
 
-                const num = getNumberFromPositions(nuevaI, nuevaJ, infoMatrix[0].length);
+                const boolVisited = !(includesPosition(visited, {i:nuevaI, j:nuevaJ}));
+                const boolQ = !(includesPosition(queue, {i:nuevaI, j:nuevaJ}));
 
-                const boolVisited = !(visited.includes(num));
-                const boolQ = !(queue.includes(num));
-
-                if(infoMatrix[nuevaI][nuevaJ].mineNumber===0 &&  boolVisited && boolQ) queue.push(num);
+                if(infoMatrix[nuevaI][nuevaJ].mineNumber===0 &&  boolVisited && boolQ) queue.push({i:nuevaI, j:nuevaJ});
 
                 revealNumber(nuevaI, nuevaJ);
 
@@ -300,6 +298,16 @@ function clearZeroes(i=-1, j=-1){
     }
 
 
+}
+
+//esta es una funcion para comprobar si el array que guarda objetos con dos propiedades i y j, ya tiene uno igual que el que se le pasa
+//por parametros. esta funcion solo funciona para objetos que guaden una position con i y j
+function includesPosition(array, obj){
+    for(const iteration of array){
+        if(iteration.i===obj.i && iteration.j === obj.j) return true;
+    }
+
+    return false;
 }
 
 function boardRightClick(i=-1, j=-1){
@@ -340,23 +348,6 @@ function checkWin(){
     }
 
     if(possibleWin) alert("HAS GANADO!!!!!!!");
-}
-
-function getPostionFromNumber(num, dimensionY){
-
-    const positions=[];
-
-    positions.push(Math.floor(num/dimensionY));
-    positions.push(num - positions[0]*dimensionY);
-
-    return positions;
-
-}
-
-function getNumberFromPositions(i, j, dimensionY){
-
-    return i*dimensionY + j;
-
 }
 
 function changeMode(newPalette){
