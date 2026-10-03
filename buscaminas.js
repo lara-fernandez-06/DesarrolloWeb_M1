@@ -30,12 +30,21 @@ let currentPalette = lightDefaultPalette; //esta sera la por defecto
 const board = document.querySelector("#board");
 let infoMatrix;
 let intervalId;
+let darkMode = false;
 
 
 generateMap();
 document.addEventListener("keydown", (e) => {
-    if(e.key== 'd' || e.key === 'D'){
-        changeMode(darkPalette);
+    if(e.key=== 'd' || e.key === 'D'){
+        if(darkMode){
+            currentPalette = lightDefaultPalette;
+            changeMode(lightDefaultPalette);
+        }else{
+            currentPalette = darkPalette;
+            changeMode(darkPalette);
+        }
+        
+        darkMode = !darkMode;
     }
 })
 
@@ -370,14 +379,6 @@ function addColorClasses(palette){
     addSingularClass(document.querySelector("#gameHeader"), palette.gameHeaderBackgroundClass); 
     addSingularClass(document.querySelector("#header"), palette.headerColor);   
 }
-
-function addClassToMany(querySearch, className){
-    for (const obj of document.querySelectorAll(querySearch)){
-        addSingularClass(obj, className);
-    }
-
-}
-
 
 //esta funcion sirve para poder hacer la distincion entre las casillas descubiertas y las que no
 //la separo para no tener que repetir la logica con las casillas pares e impares

@@ -122,22 +122,18 @@ main{
 
 /*dark board palette*/
 .oddUndiscoveredDark{
-    /*background-color: #222222;*/
     background-color: #1c2025;
 }
 
 .evenUndiscoveredDark{
-    /*background-color: #343434;*/
     background-color: #20252b;
 }
 
 .oddDiscoveredDark{    
-    /*background-color: #535353;*/
     background-color: #252a30;
 }
 
-.evenDiscoveredDark{    
-    /*background-color: #606060;*/
+.evenDiscoveredDark{
     background-color: #2c3239;
 }
 
