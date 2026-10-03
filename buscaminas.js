@@ -350,6 +350,17 @@ function checkWin(){
     if(possibleWin) alert("HAS GANADO!!!!!!!");
 }
 
+function getPostionFromNumber(num, dimensionY){
+
+    const positions=[];
+
+    positions.push(Math.floor(num/dimensionY));
+    positions.push(num - positions[0]*dimensionY);
+
+    return positions;
+
+}
+
 function changeMode(newPalette){
     removeColorClasses(currentPalette);
     addColorClasses(newPalette);
