@@ -28,8 +28,12 @@ const darkPalette = {
 let currentPalette = lightDefaultPalette; //esta sera la por defecto 
 
 const board = document.querySelector("#board");
+const counter = document.querySelector("#mineCounter");
+const rodeoX = [-1, 0, 1, 1, 1, 0, -1, -1];
+const rodeoY = [-1, -1, -1, 0, 1, 1, 1, 0];
 let infoMatrix;
 let intervalId;
+let mineCounter;
 let darkMode = false;
 
 
@@ -44,6 +48,8 @@ function startGame(){
 
 //dimension por defecto es 14x18
 function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defaultMines){
+
+    mineCounter = mines; //la guardamos en la variable global para poder consultarla mas adelante
     
     //control de errores: no puede haber mas minas que el cuadrado de la dim (las minas seran un 25% del tablero)
     if(mines>=dimensionX*dimensionY) mines = Math.floor(0.25*dimensionX*dimensionY);
@@ -53,7 +59,7 @@ function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defau
 
     //creamos el tablero en la web
     createWebMatrix(dimensionX, dimensionY, mines);
-    addColorClasses(currentPalette);
+    toggleMode(currentPalette);
 
     //primero rellenamos la matriz que guarda la información (donde están las minas (-1) y los números)
     generateMines(mines);
@@ -95,13 +101,6 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
         for(let j=0; j<dimensionY; j++){
             const cell = document.createElement("div");
             cell.classList.add("cell");
-            if((i+j)%2){
-                //esta clase la incluimos para poder seleccionar solo estas con una query
-                addSingularClass(cell, "odd");
-                //mientras que esta solo le aporta el color
-            }else{
-                addSingularClass(cell, "even");
-            } 
             cell.dataset.i=i;
             cell.dataset.j=j;
             //pongo solo row porque se que quiero que el hijo se añada a la fila que acabo de crear
@@ -110,20 +109,20 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
 
     }
 
-    document.querySelector("#mineCounter").textContent = mines;
+    counter.textContent = mines;
     
 }
 
 function generateMines(mines=defaultMines){
     
     let cont=0;
-    let max=infoMatrix.length*infoMatrix[0].length; //para evitar hacer esta operacion todo el rato
+    const max=infoMatrix.length*infoMatrix[0].length; //para evitar hacer esta operacion todo el rato
 
     //hasta que todas las minas hayan sido colocadas
     while(cont<mines){
 
         //numero de casilla
-        let num=Math.floor(Math.random()*max); //numero de la casilla de la mina
+        const num=Math.floor(Math.random()*max); //numero de la casilla de la mina
         
         //calculamos las posiciones en la matriz (i, j)
         const positions = getPostionFromNumber(num, infoMatrix[0].length);
@@ -137,13 +136,6 @@ function generateMines(mines=defaultMines){
 }
 
 function generateMapNumbers(){
-
-    // [] [] [] [] []
-    // [] [x] [] [] []
-    // [] [] [] [] []
-
-    const rodeoX = [-1, 0, 1, 1, 1, 0, -1, -1];
-    const rodeoY = [-1, -1, -1, 0, 1, 1, 1, 0];
 
     //recorremos toda la matriz, mirando alrededor de la casilla actual para contar las minas
     for(let i = 0; i<infoMatrix.length; i++){
@@ -178,20 +170,8 @@ function generateMapNumbers(){
 
 //esta funcion solo la añadimos para aumentar legibilidad
 function addEvents(){
-    board.addEventListener("click", function(e){
-        let secCounter = 0;
-        intervalId = setInterval(()=>{
-            const chrono = document.querySelector("#chrono")
-            secCounter++;
-
-            if(secCounter<10) chrono.textContent=`00${secCounter}`
-            else if(secCounter<100) chrono.textContent=`0${secCounter}`
-            else chrono.textContent=`${secCounter}`
-
-            if(secCounter>=999) clearInterval(intervalId);
-        }, 1000)
-
-    }, {once:true});//solo funciona una vez (sino resetaríamos el chrono con cada click)
+    
+    addStartChronoEvent();
 
     //click izquierdo
     board.addEventListener("click", (e) =>{
@@ -210,11 +190,13 @@ function addEvents(){
     document.addEventListener("keydown", (e) => {
         if(e.key=== 'd' || e.key === 'D'){
             if(darkMode){
+                toggleMode(currentPalette);
+                toggleMode(lightDefaultPalette);
                 currentPalette = lightDefaultPalette;
-                changeMode(lightDefaultPalette);
             }else{
+                toggleMode(currentPalette);
+                toggleMode(darkPalette);
                 currentPalette = darkPalette;
-                changeMode(darkPalette);
             }
             
             darkMode = !darkMode;
@@ -223,7 +205,7 @@ function addEvents(){
 
     document.querySelector("#reloadButton").addEventListener("click", (e)=>{
         resetGame();
-        startGame();
+        generateMap();
     })
 
 }
@@ -232,6 +214,26 @@ function resetGame(){
     board.innerHTML="";
     clearInterval(intervalId);
     document.querySelector("#chrono").textContent='000';
+    addStartChronoEvent();
+    
+}
+
+function addStartChronoEvent(){
+    board.addEventListener("click", function(e){
+        let secCounter = 0;
+        intervalId = setInterval(()=>{
+            const chrono = document.querySelector("#chrono")
+            secCounter++;
+
+            if(secCounter<10) chrono.textContent=`00${secCounter}`
+            else if(secCounter<100) chrono.textContent=`0${secCounter}`
+            else chrono.textContent=`${secCounter}`
+
+            if(secCounter>=999) clearInterval(intervalId);
+        }, 1000)
+
+    }, {once:true});//solo funciona una vez (sino resetaríamos el chrono con cada click)
+
 }
 
 function boardLeftClick(i=-1, j=-1){
@@ -269,7 +271,6 @@ function revealNumber(i=-1, j=-1){
 
     //para que si se revela una casilla con los ceros, no se quede la bandera inutilizada
     if(infoMatrix[i][j].flagged){
-        const counter = document.querySelector("#mineCounter");
         const mines = Number(counter.textContent);
 
         counter.textContent = mines + 1;
@@ -290,8 +291,6 @@ function clearZeroes(i=-1, j=-1){
     //la cola de casillas 0 que tenemos que limpiar
     const queue = [];
     const visited = []; //guardamos las casillas con ceros que ya hemos visitado
-    const rodeoX = [-1, 0, 1, 1, 1, 0, -1, -1];
-    const rodeoY = [-1, -1, -1, 0, 1, 1, 1, 0];
 
     revealNumber(i, j);
 
@@ -342,19 +341,16 @@ function boardRightClick(i=-1, j=-1){
         return;
     }
 
-    if(infoMatrix[i][j].discovered == true) return;
+    if(infoMatrix[i][j].discovered === true) return;
 
-    const counter = document.querySelector("#mineCounter");
-    const mines = Number(counter.textContent);
-
-    if(mines<=0) return; //si ya no quedan banderas no se pueden poner mas
+    if(mineCounter<=0 && !infoMatrix[i][j].flagged) return; //si ya no quedan banderas no se pueden poner mas
 
     const cell = board.children[i].children[j];
     
     cell.classList.toggle("flagged");
 
     //si ya tenia bandera, se la quita -> sumamos una al contador
-    infoMatrix[i][j].flagged ? counter.textContent = mines+1 : counter.textContent = mines-1;
+    infoMatrix[i][j].flagged ? counter.textContent = ++mineCounter : counter.textContent = --mineCounter;
 
     infoMatrix[i][j].flagged = !infoMatrix[i][j].flagged;
 
@@ -386,58 +382,26 @@ function getPostionFromNumber(num, dimensionY){
 
 }
 
-function changeMode(newPalette){
-    removeColorClasses(currentPalette);
-    addColorClasses(newPalette);
-}
-
 function exchangeClasses(obj, classToRemove, classToAdd){
     obj.classList.remove(classToRemove);
-    addSingularClass(obj, classToAdd); 
+    obj.classList.add(classToAdd);
 }
 
-//estas funciones nos sirven para cambiar la paleta de colores
-//he decidido hacelo asi en vez de con la funcion de intercambiar clases que ya tengo para poder utilizar
-//addColorClasses al cargar la pagina, y no tener algunas de las clases (como las del fondo del body) escritas en el html
-function addColorClasses(palette){
-    addSingularClass(document.querySelector("body"), palette.bodyBackgroundClass);
-    addColorToCell('.odd', palette.oddDiscoveredClass, palette.oddUndiscoveredClass);
-    addColorToCell('.even', palette.evenDiscoveredClass, palette.evenUndiscoveredClass);
-    addSingularClass(document.querySelector("#gameHeader"), palette.gameHeaderBackgroundClass); 
-    addSingularClass(document.querySelector("#header"), palette.headerColor);   
-}
+function toggleMode(palette){
+    document.querySelector("body").classList.toggle(palette.bodyBackgroundClass);
+    for(let i=0; i<infoMatrix.length; i++){
+        for(let j=0; j<infoMatrix[0].length; j++){
+            const cell = board.children[i].children[j];
+            if((i+j)%2){
+                if(infoMatrix[i][j].discovered) cell.classList.toggle(palette.oddDiscoveredClass);
+                else cell.classList.toggle(palette.oddUndiscoveredClass);
+            }else{
+                 if(infoMatrix[i][j].discovered) cell.classList.toggle(palette.evenDiscoveredClass);
+                else cell.classList.toggle(palette.evenUndiscoveredClass);
 
-//esta funcion sirve para poder hacer la distincion entre las casillas descubiertas y las que no
-//la separo para no tener que repetir la logica con las casillas pares e impares
-function addColorToCell(querySearch, discoveredClass, undiscoveredClass){
-    for (const cell of document.querySelectorAll(querySearch)){
-        const i=Number(cell.dataset.i);
-        const j=Number(cell.dataset.j);
-        if(infoMatrix[i][j].discovered) addSingularClass(cell, discoveredClass);
-        else addSingularClass(cell, undiscoveredClass);
+            }
+        }
     }
-
-}
-
-function removeColorFromCell(querySearch, discoveredClass, undiscoveredClass){
-    for (const cell of document.querySelectorAll(querySearch)){
-        const i=Number(cell.dataset.i);
-        const j=Number(cell.dataset.j);
-        if(infoMatrix[i][j].discovered) cell.classList.remove(discoveredClass);
-        else cell.classList.remove(undiscoveredClass);
-    }
-
-}
-
-//hacemos la comprobacion de que no tiene ya la clase. como conviene hacerlo cada vez que añadimos una clase, hacemos una funcion
-function addSingularClass(obj, className){
-    if(!obj.classList.contains(className)) obj.classList.add(className);
-}
-
-function removeColorClasses(palette){
-    document.querySelector("body").classList.remove(palette.bodyBackgroundClass);
-    removeColorFromCell('.odd', palette.oddDiscoveredClass, palette.oddUndiscoveredClass);
-    removeColorFromCell('.even', palette.evenDiscoveredClass, palette.evenUndiscoveredClass);
-    document.querySelector("#gameHeader").classList.remove(palette.gameHeaderBackgroundClass); 
-    document.querySelector("#header").classList.remove(palette.headerColor); 
+    document.querySelector("#gameHeader").classList.toggle(palette.gameHeaderBackgroundClass); 
+    document.querySelector("#header").classList.toggle(palette.headerColor); 
 }
