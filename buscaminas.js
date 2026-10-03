@@ -211,7 +211,7 @@ function addEvents(){
 }
 
 function resetGame(){
-    board.innerHTML="";
+    board.replaceChildren();
     clearInterval(intervalId);
     document.querySelector("#chrono").textContent='000';
     addStartChronoEvent();
