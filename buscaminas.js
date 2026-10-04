@@ -2,31 +2,6 @@ const defaultDimX=14;
 const defaultDimY=18;
 const defaultMines=40;
 
-/*COLORES TABLERO*/
-const lightDefaultPalette = {
-    bodyBackgroundClass: "bodyBackgroundDefault",
-    headerColor: "headerColorDefault",
-    gameHeaderBackgroundClass: "gameHeaderColorDefault",
-    evenUndiscoveredClass: "evenUndiscoveredDefault",
-    oddUndiscoveredClass: "oddUndiscoveredDefault",
-    evenDiscoveredClass: "evenDiscoveredDefault",
-    oddDiscoveredClass: "oddDiscoveredDefault"
-}
-
-const darkPalette = {
-    bodyBackgroundClass: "bodyBackgroundDark",
-    headerColor: "headerColorDark",
-    gameHeaderBackgroundClass: "gameHeaderColorDark",
-    evenUndiscoveredClass: "evenUndiscoveredDark",
-    oddUndiscoveredClass: "oddUndiscoveredDark",
-    evenDiscoveredClass: "evenDiscoveredDark",
-    oddDiscoveredClass: "oddDiscoveredDark",
-    
-}
-
-//aqui guardaremos la informacion de los colores/modo que se este utilizando ahora
-let currentPalette = lightDefaultPalette; //esta sera la por defecto 
-
 const board = document.querySelector("#board");
 const counter = document.querySelector("#mineCounter");
 const rodeoX = [-1, 0, 1, 1, 1, 0, -1, -1];
@@ -34,8 +9,7 @@ const rodeoY = [-1, -1, -1, 0, 1, 1, 1, 0];
 let infoMatrix;
 let intervalId;
 let mineCounter;
-let darkMode = false;
-
+let gameEnded = false;
 
 startGame();
 
@@ -59,7 +33,6 @@ function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defau
 
     //creamos el tablero en la web
     createWebMatrix(dimensionX, dimensionY, mines);
-    toggleMode(currentPalette);
 
     //primero rellenamos la matriz que guarda la información (donde están las minas (-1) y los números)
     generateMines(mines);
@@ -101,6 +74,8 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
         for(let j=0; j<dimensionY; j++){
             const cell = document.createElement("div");
             cell.classList.add("cell");
+            if((i+j)%2) cell.classList.add("oddUndiscovered");
+            else cell.classList.add("evenUndiscovered");
             cell.dataset.i=i;
             cell.dataset.j=j;
             //pongo solo row porque se que quiero que el hijo se añada a la fila que acabo de crear
@@ -175,6 +150,7 @@ function addEvents(){
 
     //click izquierdo
     board.addEventListener("click", (e) =>{
+        if(gameEnded) return;
         const cell = e.target.closest(".cell");
         boardLeftClick(Number(cell.dataset.i), Number(cell.dataset.j));
     })
@@ -183,23 +159,14 @@ function addEvents(){
     board.addEventListener("contextmenu", (e) =>{
         const cell = e.target.closest(".cell");
         e.preventDefault(); 
+        if(gameEnded) return;
         boardRightClick(Number(cell.dataset.i), Number(cell.dataset.j));
     })
 
     //modo oscuro
     document.addEventListener("keydown", (e) => {
         if(e.key=== 'd' || e.key === 'D'){
-            if(darkMode){
-                toggleMode(currentPalette);
-                toggleMode(lightDefaultPalette);
-                currentPalette = lightDefaultPalette;
-            }else{
-                toggleMode(currentPalette);
-                toggleMode(darkPalette);
-                currentPalette = darkPalette;
-            }
-            
-            darkMode = !darkMode;
+            document.querySelector('body').classList.toggle("dark");
         }
     })
 
@@ -211,6 +178,7 @@ function addEvents(){
 }
 
 function resetGame(){
+    gameEnded = false;
     board.replaceChildren();
     clearInterval(intervalId);
     document.querySelector("#chrono").textContent='000';
@@ -220,6 +188,7 @@ function resetGame(){
 
 function addStartChronoEvent(){
     board.addEventListener("click", function(e){
+        if(gameEnded) return;
         let secCounter = 0;
         intervalId = setInterval(()=>{
             const chrono = document.querySelector("#chrono");
@@ -262,16 +231,15 @@ function revealNumber(i=-1, j=-1){
     infoMatrix[i][j].discovered = true;
 
     if((i+j)%2){
-        exchangeClasses(cell, currentPalette.oddUndiscoveredClass, currentPalette.oddDiscoveredClass);
+        exchangeClasses(cell, 'oddUndiscovered','oddDiscovered');
     }else{
-        exchangeClasses(cell, currentPalette.evenUndiscoveredClass, currentPalette.evenDiscoveredClass); 
+        exchangeClasses(cell, 'evenUndiscovered', 'evenDiscovered'); 
     }
 
     //para que si se revela una casilla con los ceros, no se quede la bandera inutilizada
     if(infoMatrix[i][j].flagged){
-        const mines = Number(counter.textContent);
 
-        counter.textContent = mines + 1;
+        counter.textContent = ++mineCounter;
         cell.classList.remove("flagged");
 
         infoMatrix[i][j].flagged = false;
@@ -281,6 +249,7 @@ function revealNumber(i=-1, j=-1){
 
 function loseGame(){
 
+    gameEnded=true;
     clearInterval(intervalId);
 
     for(let i = 0; i<infoMatrix.length; i++){
