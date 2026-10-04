@@ -157,12 +157,12 @@ body.dark .evenDiscovered{
 }
 
 body.dark .oddUndiscovered{     
-    background-color: #455e51;
+    background-color: #466a57;
     
 }
 
 body.dark .evenUndiscovered{
-    background-color: #56716d;
+    background-color: #4d7b68;
 }
 
 body.dark #difficulty{
