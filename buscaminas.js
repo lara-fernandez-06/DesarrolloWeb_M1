@@ -11,6 +11,7 @@ let infoMatrix;
 let intervalId;
 let mineCounter;
 let gameEnded = false;
+let chronoStarted = false;
 
 startGame();
 
@@ -23,17 +24,17 @@ function startGame(){
 
 //dimension por defecto es 14x18
 function generateMap(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defaultMines){
-
-    mineCounter = mines; //la guardamos en la variable global para poder consultarla mas adelante
     
     //control de errores: no puede haber mas minas que el cuadrado de la dim (las minas seran un 25% del tablero)
     if(mines>=dimensionX*dimensionY) mines = Math.floor(0.25*dimensionX*dimensionY);
+
+    mineCounter = mines; //la guardamos en la variable global para poder consultarla mas adelante
 
     //inicializamos matriz logica
     infoMatrix = createInfoMatrix(dimensionX, dimensionY);
 
     //creamos el tablero en la web
-    createWebMatrix(dimensionX, dimensionY, mines);
+    createWebMatrix(dimensionX, dimensionY);
 
     //primero rellenamos la matriz que guarda la información (donde están las minas (-1) y los números)
     generateMines(mines);
@@ -65,7 +66,7 @@ function createInfoMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
     
 }
 
-function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=defaultMines){
+function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY){
 
     for(let i=0; i<dimensionX; i++){
         const row = document.createElement("div");
@@ -85,7 +86,7 @@ function createWebMatrix(dimensionX=defaultDimX, dimensionY=defaultDimY, mines=d
 
     }
 
-    counter.textContent = mines;
+    counter.textContent = mineCounter;
     
 }
 
@@ -117,7 +118,7 @@ function generateMapNumbers(){
     for(let i = 0; i<infoMatrix.length; i++){
         for(let j = 0; j<infoMatrix[i].length; j++){
 
-            //si ya es un tesoro, no hace falta hacer nada
+            //si ya es una mina, no hace falta hacer nada
             if(infoMatrix[i][j].mineNumber!==-1){
                 
                 let cont = 0;
@@ -125,9 +126,9 @@ function generateMapNumbers(){
                     let nuevaI = i+rodeoX[k];
                     let nuevaJ = j+rodeoY[k];
 
-                    //miramos que lo que estamos comprobanod esta dentro del tablero
+                    //miramos que lo que estamos comprobando esta dentro del tablero
                     if(nuevaI>=0 && nuevaJ >=0 && nuevaI<infoMatrix.length && nuevaJ<infoMatrix[0].length){
-                        //si hay tesoro, aumenta el contador
+                        //si hay mina, aumenta el contador
                         if(infoMatrix[nuevaI][nuevaJ].mineNumber===-1)cont++;
                     }
 
@@ -171,9 +172,8 @@ function addEvents(){
         }
     })
 
-    document.querySelector("#reloadButton").addEventListener("click", (e)=>{
-        resetGame();
-        generateMap();
+    document.querySelector("#reloadButton").addEventListener("click", ()=>{
+        setDifficulty(); //ponemos esta funcion porque además de resetear el juego, nos pone la dificultad en la que estabamos
     })
 
     difficulty.addEventListener("change", ()=>{
@@ -184,10 +184,15 @@ function addEvents(){
 
 function resetGame(){
     gameEnded = false;
-    board.replaceChildren();
-    clearInterval(intervalId);
-    document.querySelector("#chrono").textContent='000';
-    addStartChronoEvent();
+    board.replaceChildren();  
+    document.querySelector("#confetti").style.display = "none";  
+    
+    if(chronoStarted){
+        document.querySelector("#chrono").textContent='000';
+        clearInterval(intervalId);
+        addStartChronoEvent();
+        chronoStarted=false;
+    }
     
 }
 
@@ -203,6 +208,8 @@ function addStartChronoEvent(){
 
             if(secCounter>=999) clearInterval(intervalId);
         }, 1000)
+
+        chronoStarted = true;
 
     }, {once:true});//solo funciona una vez (sino resetaríamos el chrono con cada click)
 
@@ -264,6 +271,14 @@ function loseGame(){
     }        
 }
 
+function winGame(){
+    gameEnded=true;
+    clearInterval(intervalId);
+
+    document.querySelector("#confetti").style.display = "block";
+
+}
+
 function clearZeroes(i=-1, j=-1){
 
     if(i<0 || j<0){
@@ -271,11 +286,9 @@ function clearZeroes(i=-1, j=-1){
         return;
     } 
 
-    //los sets son estructuras que no permiten duplicadosw
     const queue = []; //la cola de casillas 0 que tenemos que limpiar
     const visited = []; //guardamos las casillas con ceros que ya hemos visitado o ya estan en cola
-
-    //haremos una matriz de bools que es mas eficiente a la hora de consultarla que una cola
+    
     for (let i = 0; i < infoMatrix.length; i++) {
         visited[i] = [];
 
@@ -285,6 +298,7 @@ function clearZeroes(i=-1, j=-1){
     }
 
     revealNumber(i, j);
+    visited[i][j]=true;
 
     queue.push({i:i, j:j});
     while(queue.length>0){
@@ -308,7 +322,7 @@ function clearZeroes(i=-1, j=-1){
 
         }
 
-        queue.shift(); //como un pop pero quita el primer elemento
+        queue.shift();
 
     }
 
@@ -349,7 +363,9 @@ function checkWin(){
         }
     }
 
-    if(possibleWin) alert("HAS GANADO!!!!!!!");
+    if(possibleWin){
+        winGame();
+    }
 }
 
 function getPostionFromNumber(num, dimensionY){
@@ -385,23 +401,4 @@ function setDifficulty(){
 function exchangeClasses(obj, classToRemove, classToAdd){
     obj.classList.remove(classToRemove);
     obj.classList.add(classToAdd);
-}
-
-function toggleMode(palette){
-    document.querySelector("body").classList.toggle(palette.bodyBackgroundClass);
-    for(let i=0; i<infoMatrix.length; i++){
-        for(let j=0; j<infoMatrix[0].length; j++){
-            const cell = board.children[i].children[j];
-            if((i+j)%2){
-                if(infoMatrix[i][j].discovered) cell.classList.toggle(palette.oddDiscoveredClass);
-                else cell.classList.toggle(palette.oddUndiscoveredClass);
-            }else{
-                 if(infoMatrix[i][j].discovered) cell.classList.toggle(palette.evenDiscoveredClass);
-                else cell.classList.toggle(palette.evenUndiscoveredClass);
-
-            }
-        }
-    }
-    document.querySelector("#gameHeader").classList.toggle(palette.gameHeaderBackgroundClass); 
-    document.querySelector("#header").classList.toggle(palette.headerColor); 
 }

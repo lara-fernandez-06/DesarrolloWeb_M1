@@ -113,6 +113,19 @@ main{
     background-repeat: no-repeat;
 }
 
+#confetti {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+
+    pointer-events: none;
+    z-index: 1000;
+
+    display: none;
+}
+
 /*dark palette*/
 body.dark{
     background-color: #12151C;
