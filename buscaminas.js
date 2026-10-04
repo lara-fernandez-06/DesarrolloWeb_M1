@@ -313,7 +313,7 @@ function clearZeroes(i=-1, j=-1){
     queue.push({i:i, j:j});
     while(queueIndex<queue.length){
 
-        const positions = {i:queue[0].i, j:queue[0].j};
+        const positions = {i:queue[queueIndex].i, j:queue[queueIndex].j};
 
         for(let k=0; k<8; k++){
             let nuevaI = positions.i+rodeoX[k];
