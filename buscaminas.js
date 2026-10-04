@@ -3,8 +3,10 @@ const defaultDimY=18;
 const defaultMines=40;
 
 const board = document.querySelector("#board");
-const counter = document.querySelector("#mineCounter");
 const difficulty = document.querySelector("#difficulty");
+const counter = document.querySelector("#mineCounter");
+const chrono = document.querySelector("#chrono");
+
 const rodeoX = [-1, 0, 1, 1, 1, 0, -1, -1];
 const rodeoY = [-1, -1, -1, 0, 1, 1, 1, 0];
 let infoMatrix;
@@ -153,15 +155,22 @@ function addEvents(){
     //click izquierdo
     board.addEventListener("click", (e) =>{
         if(gameEnded) return;
+
         const cell = e.target.closest(".cell");
+        if(!cell) return;
+
         boardLeftClick(Number(cell.dataset.i), Number(cell.dataset.j));
     })
 
     //click derecho
     board.addEventListener("contextmenu", (e) =>{
+        e.preventDefault();
+        
         const cell = e.target.closest(".cell");
-        e.preventDefault(); 
+        if(!cell) return;
+ 
         if(gameEnded) return;
+
         boardRightClick(Number(cell.dataset.i), Number(cell.dataset.j));
     })
 
@@ -201,10 +210,10 @@ function addStartChronoEvent(){
         if(gameEnded) return;
         let secCounter = 0;
         intervalId = setInterval(()=>{
-            const chrono = document.querySelector("#chrono");
+            
             secCounter++;
             
-            chrono.textContent = String(secCounter).padStart(3,'0');
+            chrono.textContent = `${String(secCounter).padStart(3,'0')}`;
 
             if(secCounter>=999) clearInterval(intervalId);
         }, 1000)
@@ -289,11 +298,11 @@ function clearZeroes(i=-1, j=-1){
     const queue = []; //la cola de casillas 0 que tenemos que limpiar
     const visited = []; //guardamos las casillas con ceros que ya hemos visitado o ya estan en cola
     
-    for (let i = 0; i < infoMatrix.length; i++) {
-        visited[i] = [];
+    for (let k = 0; k < infoMatrix.length; k++) {
+        visited[k] = [];
 
-        for (let j = 0; j < infoMatrix[0].length; j++) {
-            visited[i][j] = false;
+        for (let l = 0; l < infoMatrix[0].length; l++) {
+            visited[k][l] = false;
         }
     }
 
