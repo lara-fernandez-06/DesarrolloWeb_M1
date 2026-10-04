@@ -41,6 +41,7 @@ main{
     font-family: 'pirate';
     padding: 0.25rem .5rem;
     border-radius: 5px;
+    background-color: rgb(215, 215, 215);
 }
 
 .gameHeaderContainer{
@@ -140,11 +141,11 @@ body.dark #gameHeader{
 }
 
 body.dark .gameHeaderText{
-    color: white;
+    color: rgb(215, 215, 215);
 }
 
 body.dark .cell{
-    color: white;
+    color: rgb(215, 215, 215);
 }
 
 body.dark .oddDiscovered{
@@ -162,6 +163,12 @@ body.dark .oddUndiscovered{
 
 body.dark .evenUndiscovered{
     background-color: #56716d;
+}
+
+body.dark #difficulty{
+    background-color: #12151C;
+    border-color: #12151C;
+    color: rgb(215, 215, 215);
 }
 
 body.dark .flagged{

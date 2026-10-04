@@ -207,6 +207,9 @@ function resetGame(){
 
 function addStartChronoEvent(){
     board.addEventListener("click", function(e){
+
+        chronoStarted = true;
+
         if(gameEnded) return;
         let secCounter = 0;
         intervalId = setInterval(()=>{
@@ -217,8 +220,7 @@ function addStartChronoEvent(){
 
             if(secCounter>=999) clearInterval(intervalId);
         }, 1000)
-
-        chronoStarted = true;
+        
 
     }, {once:true});//solo funciona una vez (sino resetaríamos el chrono con cada click)
 
