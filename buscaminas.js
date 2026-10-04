@@ -222,12 +222,12 @@ function addStartChronoEvent(){
     board.addEventListener("click", function(e){
         let secCounter = 0;
         intervalId = setInterval(()=>{
-            const chrono = document.querySelector("#chrono")
+            const chrono = document.querySelector("#chrono");
             secCounter++;
 
-            if(secCounter<10) chrono.textContent=`00${secCounter}`
-            else if(secCounter<100) chrono.textContent=`0${secCounter}`
-            else chrono.textContent=`${secCounter}`
+            if(secCounter<10) chrono.textContent=`00${secCounter}`;
+            else if(secCounter<100) chrono.textContent=`0${secCounter}`;
+            else chrono.textContent=`${secCounter}`;
 
             if(secCounter>=999) clearInterval(intervalId);
         }, 1000)
@@ -288,16 +288,24 @@ function clearZeroes(i=-1, j=-1){
         return;
     } 
 
-    //la cola de casillas 0 que tenemos que limpiar
-    const queue = [];
-    const visited = []; //guardamos las casillas con ceros que ya hemos visitado
+    //los sets son estructuras que no permiten duplicadosw
+    const queue = []; //la cola de casillas 0 que tenemos que limpiar
+    const visited = []; //guardamos las casillas con ceros que ya hemos visitado o ya estan en cola
+
+    //haremos una matriz de bools que es mas eficiente a la hora de consultarla que una cola
+    for (let i = 0; i < infoMatrix.length; i++) {
+        visited[i] = [];
+
+        for (let j = 0; j < infoMatrix[0].length; j++) {
+            visited[i][j] = false;
+        }
+    }
 
     revealNumber(i, j);
 
     queue.push({i:i, j:j});
     while(queue.length>0){
 
-        visited.push(queue[0]);
         const positions = {i:queue[0].i, j:queue[0].j};
 
         for(let k=0; k<8; k++){
@@ -306,10 +314,10 @@ function clearZeroes(i=-1, j=-1){
 
             if(nuevaI>=0 && nuevaJ >=0 && nuevaI<infoMatrix.length && nuevaJ<infoMatrix[0].length){
 
-                const boolVisited = !(includesPosition(visited, {i:nuevaI, j:nuevaJ}));
-                const boolQ = !(includesPosition(queue, {i:nuevaI, j:nuevaJ}));
-
-                if(infoMatrix[nuevaI][nuevaJ].mineNumber===0 &&  boolVisited && boolQ) queue.push({i:nuevaI, j:nuevaJ});
+                if(infoMatrix[nuevaI][nuevaJ].mineNumber===0 && !visited[nuevaI][nuevaJ]){
+                    queue.push({i:nuevaI, j:nuevaJ});
+                    visited[nuevaI][nuevaJ]=true;
+                } 
 
                 revealNumber(nuevaI, nuevaJ);
 
@@ -322,16 +330,6 @@ function clearZeroes(i=-1, j=-1){
     }
 
 
-}
-
-//esta es una funcion para comprobar si el array que guarda objetos con dos propiedades i y j, ya tiene uno igual que el que se le pasa
-//por parametros. esta funcion solo funciona para objetos que guaden una position con i y j
-function includesPosition(array, obj){
-    for(const iteration of array){
-        if(iteration.i===obj.i && iteration.j === obj.j) return true;
-    }
-
-    return false;
 }
 
 function boardRightClick(i=-1, j=-1){
