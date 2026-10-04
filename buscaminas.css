@@ -12,10 +12,6 @@ body{
 
 }
 
-body.dark{
-    background-color: #121417;
-}
-
 header{
     /*orden*/
     display: flex;
@@ -25,10 +21,6 @@ header{
     font-family: "pirate";
     font-size: 5em;
     color: #588157;
-}
-
-body.dark header{
-    color: #28303b;
 }
 
 main{
@@ -43,10 +35,6 @@ main{
     display: flex;
     justify-content: space-around;
     align-items: center;
-}
-
-body.dark #gameHeader{
-    background-color: #252B33;
 }
 
 .gameHeaderContainer{
@@ -89,7 +77,6 @@ body.dark #gameHeader{
     font-family: "pirate";
 }
 
-/*default board palette*/
 .oddUndiscovered{
     background-color: #87986a;
 }
@@ -106,24 +93,6 @@ body.dark #gameHeader{
     background-color: #ebcaa9;;
 }
 
-/*dark board palette*/
-body.dark .oddUndiscovered{
-    background-color: #1c2025;
-}
-
-body.dark .evenUndiscovered{
-    background-color: #20252b;
-}
-
-body.dark .oddDiscovered{    
-    background-color: #252a30;
-}
-
-body.dark .evenDiscovered{
-    background-color: #2c3239;
-}
-
-
 .flagged{
     background-image: url('media/img/flag.png');
     background-size: 75%;
@@ -137,5 +106,48 @@ body.dark .evenDiscovered{
     background-position: center;
     background-repeat: no-repeat;
 }
+
+/*dark palette*/
+body.dark{
+    background-color: #12151C;
+}
+
+body.dark header{
+    color: #3f5f89;
+}
+
+body.dark #gameHeader{
+    background-color: #385446;
+}
+
+body.dark .gameHeaderText{
+    color: white;
+}
+
+body.dark .cell{
+    color: white;
+}
+
+body.dark .oddDiscovered{
+    background-color: #537097;
+}
+
+body.dark .evenDiscovered{
+    background-color: #658da8;
+}
+
+body.dark .oddUndiscovered{     
+    background-color: #455e51;
+    
+}
+
+body.dark .evenUndiscovered{
+    background-color: #56716d;
+}
+
+body.dark .flagged{
+    background-image: url('media/img/darkFlag.png');
+}
+
 
 
