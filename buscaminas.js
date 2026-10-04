@@ -392,19 +392,17 @@ function getPositionFromNumber(num, dimensionY){
 }
 
 function setDifficulty(){
+    resetGame();
     switch(difficulty.value){
         case "easy":
-            resetGame();
             generateMap(8, 10, 10);
         break;
 
         case "medium":
-            resetGame();
             generateMap();
         break;
 
         case "hard":
-            resetGame();
             generateMap(20, 24, 99);
         break;
     }
