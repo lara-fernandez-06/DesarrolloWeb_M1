@@ -6,7 +6,7 @@ Misión M1 · El Despertar del DOM — Web Development I.
 Abre la pagina y podrás ver el tablero, el numero de minas que tienes por descubrir y un cronómetro que comenzará cuando hagas tu primer click. Utiliza el click izquierdo para descubrir lo que hay en una casilla, y click derecho para marcar que hay una mina y poner una bandera. Para ganar, debes descubrir todas las casillas que no sean minas. Buena suerte!!
 
 ## Uso de IA
-He utilizado ChatGPT. Lo principal para lo que he usado IA es para hacer el tablero en css con casillas que tuvieran un ratio 1/1 y que no cambiasen de tamaño si cambiaba la pantalla. Sobre el mismo tema, la he utilizado para buscar información sobre la propiedad display: grid en css, y en un par de cuestiones sobre métodos de javascript, como el .shift() para los arrays o .inlcudes() para ver si existe un elemento en una lista.
+He utilizado ChatGPT. Lo principal para lo que he usado IA es para hacer el tablero en css con casillas que tuvieran un ratio 1/1 y que no cambiasen de tamaño si cambiaba la pantalla. Sobre el mismo tema, la he utilizado para buscar información sobre la propiedad display: grid en css, y en un par de cuestiones sobre métodos de javascript, como el .shift() para los arrays o .inlcudes() para ver si existe un elemento en una lista. Al final del proyecto también le pedí ayuda para hacer la parte css del menu de difficultad.
 
 Ejemplos: 
 "cómo hago en js un pop para el primer elemento"

@@ -4,6 +4,7 @@ const defaultMines=40;
 
 const board = document.querySelector("#board");
 const counter = document.querySelector("#mineCounter");
+const difficulty = document.querySelector("#difficulty");
 const rodeoX = [-1, 0, 1, 1, 1, 0, -1, -1];
 const rodeoY = [-1, -1, -1, 0, 1, 1, 1, 0];
 let infoMatrix;
@@ -173,6 +174,10 @@ function addEvents(){
     document.querySelector("#reloadButton").addEventListener("click", (e)=>{
         resetGame();
         generateMap();
+    })
+
+    difficulty.addEventListener("change", ()=>{
+        setDifficulty();
     })
 
 }
@@ -356,6 +361,25 @@ function getPostionFromNumber(num, dimensionY){
 
     return positions;
 
+}
+
+function setDifficulty(){
+    switch(difficulty.value){
+        case "easy":
+            resetGame();
+            generateMap(8, 10, 10);
+        break;
+
+        case "medium":
+            resetGame();
+            generateMap();
+        break;
+
+        case "hard":
+            resetGame();
+            generateMap(20, 24, 99);
+        break;
+    }
 }
 
 function exchangeClasses(obj, classToRemove, classToAdd){

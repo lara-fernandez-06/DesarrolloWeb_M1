@@ -16,7 +16,7 @@ header{
     /*orden*/
     display: flex;
     justify-content: space-around;
-    margin: 4vh 10vw;
+    margin: 2vh 10vw;
     /*texto*/
     font-family: "pirate";
     font-size: 5em;
@@ -35,6 +35,12 @@ main{
     display: flex;
     justify-content: space-around;
     align-items: center;
+}
+
+#difficulty{
+    font-family: 'pirate';
+    padding: 0.25rem .5rem;
+    border-radius: 5px;
 }
 
 .gameHeaderContainer{
@@ -147,6 +153,14 @@ body.dark .evenUndiscovered{
 
 body.dark .flagged{
     background-image: url('media/img/darkFlag.png');
+}
+
+body.dark #mineCounterFlag{
+    content: url('media/img/darkFlag.png');
+}
+
+body.dark #reloadButton{
+    content: url("media/img/whiteReloadArrow.png")
 }
 
 
