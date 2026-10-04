@@ -104,10 +104,10 @@ function generateMines(mines=defaultMines){
         const num=Math.floor(Math.random()*max); //numero de la casilla de la mina
         
         //calculamos las posiciones en la matriz (i, j)
-        const positions = getPostionFromNumber(num, infoMatrix[0].length);
+        const positions = getPositionFromNumber(num, infoMatrix[0].length);
 
-        if(infoMatrix[positions[0]][positions[1]].mineNumber !== -1){
-            infoMatrix[positions[0]][positions[1]].mineNumber = -1;
+        if(infoMatrix[positions.i][positions.j].mineNumber !== -1){
+            infoMatrix[positions.i][positions.j].mineNumber = -1;
             cont++;
         }
     }
@@ -165,7 +165,7 @@ function addEvents(){
     //click derecho
     board.addEventListener("contextmenu", (e) =>{
         e.preventDefault();
-        
+
         const cell = e.target.closest(".cell");
         if(!cell) return;
  
@@ -197,7 +197,7 @@ function resetGame(){
     document.querySelector("#confetti").style.display = "none";  
     
     if(chronoStarted){
-        document.querySelector("#chrono").textContent='000';
+        chrono.textContent='000';
         clearInterval(intervalId);
         addStartChronoEvent();
         chronoStarted=false;
@@ -297,6 +297,7 @@ function clearZeroes(i=-1, j=-1){
 
     const queue = []; //la cola de casillas 0 que tenemos que limpiar
     const visited = []; //guardamos las casillas con ceros que ya hemos visitado o ya estan en cola
+    let queueIndex = 0; //con esto en vez del shift el algoritmo es mas optimo
     
     for (let k = 0; k < infoMatrix.length; k++) {
         visited[k] = [];
@@ -310,7 +311,7 @@ function clearZeroes(i=-1, j=-1){
     visited[i][j]=true;
 
     queue.push({i:i, j:j});
-    while(queue.length>0){
+    while(queueIndex<queue.length){
 
         const positions = {i:queue[0].i, j:queue[0].j};
 
@@ -331,7 +332,7 @@ function clearZeroes(i=-1, j=-1){
 
         }
 
-        queue.shift();
+        queueIndex++;
 
     }
 
@@ -377,12 +378,12 @@ function checkWin(){
     }
 }
 
-function getPostionFromNumber(num, dimensionY){
+function getPositionFromNumber(num, dimensionY){
 
-    const positions=[];
+    const positions={};
 
-    positions.push(Math.floor(num/dimensionY));
-    positions.push(num - positions[0]*dimensionY);
+    positions.i=Math.floor(num/dimensionY);
+    positions.j=num - positions.i*dimensionY;
 
     return positions;
 
