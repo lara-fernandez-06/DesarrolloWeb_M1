@@ -224,10 +224,8 @@ function addStartChronoEvent(){
         intervalId = setInterval(()=>{
             const chrono = document.querySelector("#chrono");
             secCounter++;
-
-            if(secCounter<10) chrono.textContent=`00${secCounter}`;
-            else if(secCounter<100) chrono.textContent=`0${secCounter}`;
-            else chrono.textContent=`${secCounter}`;
+            
+            chrono.textContent = String(secCounter).padStart(3,'0');
 
             if(secCounter>=999) clearInterval(intervalId);
         }, 1000)
@@ -244,8 +242,8 @@ function boardLeftClick(i=-1, j=-1){
 
     if(infoMatrix[i][j].flagged) return; //no se puede liberar si tienes una bandera
 
-    if(infoMatrix[i][j].mineNumber===-1) alert("BOOM") 
-    else if(infoMatrix[i][j].mineNumber===0) clearZeroes(i, j)
+    if(infoMatrix[i][j].mineNumber===-1) loseGame(); 
+    else if(infoMatrix[i][j].mineNumber===0) clearZeroes(i, j);
     else revealNumber(i, j);
 
     checkWin();
@@ -279,6 +277,17 @@ function revealNumber(i=-1, j=-1){
         infoMatrix[i][j].flagged = false;
     }
 
+}
+
+function loseGame(){
+
+    clearInterval(intervalId);
+
+    for(let i = 0; i<infoMatrix.length; i++){
+        for(let j = 0; j<infoMatrix[i].length; j++){
+            if(infoMatrix[i][j].mineNumber===-1) board.children[i].children[j].classList.add("mine");
+        }
+    }        
 }
 
 function clearZeroes(i=-1, j=-1){

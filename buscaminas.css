@@ -145,4 +145,11 @@ main{
     background-repeat: no-repeat;
 }
 
+.mine{
+    background-image: url('media/img/mine.png');
+    background-size: 75%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 
